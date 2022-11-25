@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management;
-using System.Reflection.Metadata;
+﻿using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace WinSdUtil.Lib.Model
 {
@@ -20,9 +15,9 @@ namespace WinSdUtil.Lib.Model
                 if (Owner.Length > 0) sb.Append($"O:{Owner}");
                 if (Group.Length > 0) sb.Append($"G:{Group}");
                 if (DAclFlags.Length > 0) sb.Append($"D:{DAclFlags}");
-                sb.Append(DAclAces);
+                DAclAces.Select(a => sb.Append(a));
                 if (SAclFlags.Length > 0) sb.Append($"S:{SAclFlags}");
-                sb.Append(SAclAces);
+                SAclAces.Select(a => sb.Append(a));
                 return sb.ToString();
             }
             set
@@ -36,20 +31,21 @@ namespace WinSdUtil.Lib.Model
                 if (sddlMatch.Groups.ContainsKey("DAclFlags"))
                     DAclFlags = sddlMatch.Groups["DAclFlags"].Value;
                 if (sddlMatch.Groups.ContainsKey("DAclAces"))
-                    DAclAces = sddlMatch.Groups["DAclAces"].Value;
+                    DAclAces = sddlMatch.Groups["DAclAces"].Captures.Select(c => c.Value).ToArray();
                 if (sddlMatch.Groups.ContainsKey("SAclFlags"))
                     SAclFlags = sddlMatch.Groups["SAclFlags"].Value;
                 if (sddlMatch.Groups.ContainsKey("SAclAces"))
-                    SAclAces = sddlMatch.Groups["SAclAces"].Value;
+                    SAclAces = sddlMatch.Groups["SAclAces"].Captures.Select(c => c.Value).ToArray();
             }
         }
         public string Owner { get; set; } = string.Empty;
         public string Group { get; set; } = string.Empty;
         public string DAclFlags { get; set; } = string.Empty;
-        public string DAclAces { get; set; } = string.Empty;
+        public string[] DAclAces { get; set; } = Array.Empty<string>();
         public string SAclFlags { get; set; } = string.Empty;
-        public string SAclAces { get; set; } = string.Empty;
+        public string[] SAclAces { get; set; } = Array.Empty<string>();
 
+        public SDDL() { }
         public SDDL(byte[] BinarySd)
         {
             using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
@@ -62,9 +58,31 @@ namespace WinSdUtil.Lib.Model
             if (rtValue != 0) { throw new ArgumentException($"Given byte array is not valid Windows SD. Win32 error: {rtValue}"); }
         }
 
+        public SDDL(string SddlString)
+        {
+            Value = SddlString;
+        }
+
         public AccessControlList ToACL()
         {
             return new AccessControlList(this);
+        }
+
+        public byte[] ToBinarySd()
+        {
+            using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
+
+            var inparam = Win32SdHelper.GetMethodParameters("SDDLToBinarySD");
+            inparam["SDDL"] = this.Value;
+            var outparam = Win32SdHelper.InvokeMethod("SDDLToBinarySD", inparam, null);
+            var rtValue = (uint)outparam["ReturnValue"];
+            if (rtValue == 0) return (byte[])outparam["BinarySD"];
+            else { throw new ArgumentException($"Unable to convert SDDL \"{this.Value}\" to Binary SD. Win32 error: {rtValue}"); }
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 }

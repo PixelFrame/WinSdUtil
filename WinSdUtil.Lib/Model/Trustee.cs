@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using WinSdUtil.Lib.Data;
 
 namespace WinSdUtil.Lib.Model
@@ -16,7 +10,7 @@ namespace WinSdUtil.Lib.Model
         public string DisplayName { get; private set; } = "NULL";
         public string SddlName { get; private set; } = "S-1-0-0";
         public string Description { get; private set; } = "";
-        public bool   IsLocal { get; private set; } = true;
+        public bool IsLocal { get; private set; } = true;
         public string? DomainId { get; private set; } = null;
 
         public Trustee() { }
@@ -60,7 +54,7 @@ namespace WinSdUtil.Lib.Model
                     };
                 }
             }
-            else if(!dbResult.IsLocal && SddlTrustee.Length > 2)
+            else if (!dbResult.IsLocal && SddlTrustee.Length > 2)
             {
                 dbResult.Sid = SddlTrustee;
                 dbResult.SddlName = SddlTrustee;

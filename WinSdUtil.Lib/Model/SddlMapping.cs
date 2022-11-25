@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.AccessControl;
 
 namespace WinSdUtil.Lib.Model
 {
@@ -38,12 +33,20 @@ namespace WinSdUtil.Lib.Model
             { "KX", 0x00020019 }
         };
 
-        internal static readonly Dictionary<string, string> AclFlagsMapping = new()
+        internal static readonly Dictionary<string, ControlFlags> DAclFlagsMapping = new()
         {
-            { "P" , "SE_DACL_PROTECTED" },
-            { "AR", "SE_DACL_AUTO_INHERIT_REQ" },
-            { "AI", "SE_DACL_AUTO_INHERITED" },
-            { "NO_ACCESS_CONTROL", "The ACL is null." },
+            { "P" , ControlFlags.DiscretionaryAclProtected },
+            { "AR", ControlFlags.DiscretionaryAclAutoInheritRequired },
+            { "AI", ControlFlags.DiscretionaryAclAutoInherited },
+            { "NO_ACCESS_CONTROL", ControlFlags.None },
+        };
+
+        internal static readonly Dictionary<string, ControlFlags> SAclFlagsMapping = new()
+        {
+            { "P" , ControlFlags.SystemAclProtected },
+            { "AR", ControlFlags.SystemAclAutoInheritRequired },
+            { "AI", ControlFlags.SystemAclAutoInherited },
+            { "NO_ACCESS_CONTROL", ControlFlags.None },
         };
 
         internal static readonly Dictionary<string, AceType> AceTypeMapping = new()

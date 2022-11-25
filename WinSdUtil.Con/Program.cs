@@ -1,5 +1,6 @@
-﻿using WinSdUtil.Lib;
-using WinSdUtil.Lib.Model;
+﻿using WinSdUtil.Lib.Model;
 
-var ace = new AccessControlEntry("(OA;CIIOID;2438;59ba2f42-79a2-11d0-9020-00c04fc2d3cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)");
-Console.ReadKey();
+var sddl = new SDDL("O:DAG:DAD:(A;;RPWPCCDCLCRCWOWDSDSW;;;SY)(A;;RPWPCCDCLCRCWOWDSDSW;;;S-1-5-21-123456789-123456789-123456789-114514)(OA;;CCDC;bf967aba-0de6-11d0-a285-00aa003049e2;;AO)(OA;;CCDC;bf967a9c-0de6-11d0-a285-00aa003049e2;;AO)(OA;;CCDC;6da8a4ff-0e52-11d0-a286-00aa003049e2;;AO)(OA;;CCDC;bf967aa8-0de6-11d0-a285-00aa003049e2;;PO)(A;;RPLCRC;;;AU)S:(AU;SAFA;WDWOSDWPCCDCSW;;;WD)");
+var acl = sddl.ToACL();
+var convertedSddl = acl.ToSDDL();
+Console.WriteLine(convertedSddl.Value);

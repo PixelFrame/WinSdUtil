@@ -14,10 +14,12 @@ namespace WinSdUtil.Lib.Model
                 var sb = new StringBuilder();
                 if (Owner.Length > 0) sb.Append($"O:{Owner}");
                 if (Group.Length > 0) sb.Append($"G:{Group}");
-                if (DAclFlags.Length > 0) sb.Append($"D:{DAclFlags}");
-                DAclAces.Select(a => sb.Append(a));
+                if (DAclFlags.Length > 0 || DAclAces.Length > 0) sb.Append("D:");
+                if (DAclFlags.Length > 0) sb.Append($"{DAclFlags}");
+                foreach (var DAclAce in DAclAces) sb.Append(DAclAce);
+                if (SAclFlags.Length > 0 || SAclAces.Length > 0) sb.Append("S:");
                 if (SAclFlags.Length > 0) sb.Append($"S:{SAclFlags}");
-                SAclAces.Select(a => sb.Append(a));
+                foreach (var SAclAce in SAclAces) sb.Append(SAclAce);
                 return sb.ToString();
             }
             set
@@ -46,12 +48,15 @@ namespace WinSdUtil.Lib.Model
         public string[] SAclAces { get; set; } = Array.Empty<string>();
 
         public SDDL() { }
-        public SDDL(byte[] BinarySd)
+
+        public SDDL(BinarySecurityDescriptor BinarySd) : this(BinarySd.Value) { }
+
+        private SDDL(byte[] Binary)
         {
             using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
 
             var inparam = Win32SdHelper.GetMethodParameters("BinarySDToSDDL");
-            inparam["BinarySD"] = BinarySd;
+            inparam["BinarySD"] = Binary;
             var outparam = Win32SdHelper.InvokeMethod("BinarySDToSDDL", inparam, null);
             var rtValue = (uint)outparam["ReturnValue"];
             Value = (string)outparam["SDDL"];
@@ -68,7 +73,7 @@ namespace WinSdUtil.Lib.Model
             return new AccessControlList(this);
         }
 
-        public byte[] ToBinarySd()
+        public BinarySecurityDescriptor ToBinarySd()
         {
             using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
 
@@ -76,7 +81,7 @@ namespace WinSdUtil.Lib.Model
             inparam["SDDL"] = this.Value;
             var outparam = Win32SdHelper.InvokeMethod("SDDLToBinarySD", inparam, null);
             var rtValue = (uint)outparam["ReturnValue"];
-            if (rtValue == 0) return (byte[])outparam["BinarySD"];
+            if (rtValue == 0) return new BinarySecurityDescriptor((byte[])outparam["BinarySD"]);
             else { throw new ArgumentException($"Unable to convert SDDL \"{this.Value}\" to Binary SD. Win32 error: {rtValue}"); }
         }
 

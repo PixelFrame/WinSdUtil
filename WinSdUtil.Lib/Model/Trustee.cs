@@ -22,11 +22,50 @@ namespace WinSdUtil.Lib.Model
         public Trustee() { }
         public Trustee(string SddlTrustee)
         {
-            using (var context = new LibDbContext())
+            using var context = new LibDbContext();
+            var dbResult = context.Trustees.FirstOrDefault(t => t.SddlName == SddlTrustee);
+            if (dbResult == null)
             {
-                var dbResult = context.Trustees.Single(t => t.SddlName == SddlTrustee);
-                this.Copy(dbResult);
+                if (SddlTrustee.StartsWith("S-1-5-5"))
+                {
+                    dbResult = context.Trustees.Single(t => t.SddlName == "S-1-5-5-x-y");
+                    dbResult.Sid = SddlTrustee;
+                    dbResult.SddlName = SddlTrustee;
+                }
+                else if (SddlTrustee.StartsWith("S-1-5-21"))
+                {
+                    var domainSidMatch = Regex.Match(SddlTrustee, @"S-1-5-21-(?<DomainId>.*-.*-.*)-(?<RID>.*)");
+                    dbResult = new Trustee()
+                    {
+                        Sid = SddlTrustee,
+                        Name = "DOMAIN_ACCOUNT",
+                        DisplayName = "Unknown (Domain Account)",
+                        SddlName = SddlTrustee,
+                        Description = "An account from Active Directory or local computer.",
+                        IsLocal = false,
+                        DomainId = domainSidMatch.Groups["DomainId"].Value
+                    };
+                }
+                else
+                {
+                    dbResult = new Trustee()
+                    {
+                        Sid = SddlTrustee,
+                        Name = "UNKNOWN",
+                        DisplayName = "(Unknwon Account)",
+                        SddlName = SddlTrustee,
+                        Description = "Unknown Account",
+                        IsLocal = false,
+                        DomainId = null
+                    };
+                }
             }
+            else if(!dbResult.IsLocal && SddlTrustee.Length > 2)
+            {
+                dbResult.Sid = SddlTrustee;
+                dbResult.SddlName = SddlTrustee;
+            }
+            this.Copy(dbResult!);
         }
 
         private void Copy(Trustee source)

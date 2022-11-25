@@ -11,10 +11,10 @@ namespace WinSdUtil.Lib.Model
 {
     public class AccessControlEntry
     {
-        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>[A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(?<ResourceAttribute>\([^\(\)]\))?\)";
+        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>[0-9A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(?<ResourceAttribute>\([^\(\)]\))?\)";
 
-        public AceType Type { get; set; }
-        public AceFlags Flags { get; set; }
+        public AceType Type { get; set; } = 0;
+        public AceFlags Flags { get; set; } = 0; 
         public AccessMask AccessMask { get; set; } = new();
         public Guid ObjectGuid { get; set; }
         public Guid InheritObjectGuid { get; set; }
@@ -41,14 +41,27 @@ namespace WinSdUtil.Lib.Model
             }
 
             AccessMask.Full = 0;
-            var sddlRights = regexMatchAce.Groups["Rights"].Value.SplitInParts(2);
-            foreach (var sddlRight in sddlRights)
+            var sddlRights = regexMatchAce.Groups["Rights"].Value;
+            if (Regex.IsMatch(sddlRights, @"\d*"))
             {
-                if (!SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out uint accessBit)) { throw new ArgumentException($"Invalid ACE Right: {sddlRight}"); }
-                AccessMask.Full |= accessBit;
+                if (!uint.TryParse(sddlRights, out uint accessMask))
+                { throw new ArgumentException($"Invalid ACE Right: {sddlRights}"); }
+                AccessMask.Full = accessMask;
             }
-
+            else
+            {
+                var sddlRightsList = sddlRights.SplitInParts(2);
+                foreach (var sddlRight in sddlRightsList)
+                {
+                    if (!SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out uint accessBit)) { throw new ArgumentException($"Invalid ACE Right: {sddlRight}"); }
+                    AccessMask.Full |= accessBit;
+                }
+            }
+            
             Trustee = new(regexMatchAce.Groups["AccountSid"].Value);
+
+            if(regexMatchAce.Groups["ObjectGuid"].Value != string.Empty) ObjectGuid = new Guid(regexMatchAce.Groups["ObjectGuid"].Value);
+            if (regexMatchAce.Groups["InheritObjectGuid"].Value != string.Empty) InheritObjectGuid = new Guid(regexMatchAce.Groups["InheritObjectGuid"].Value);
         }
     }
 }

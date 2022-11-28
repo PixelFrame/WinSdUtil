@@ -1,4 +1,5 @@
 ﻿using System.Security.AccessControl;
+using System.Text;
 using System.Text.RegularExpressions;
 using WinSdUtil.Lib.Helper;
 
@@ -57,6 +58,42 @@ namespace WinSdUtil.Lib.Model
 
             if (regexMatchAce.Groups["ObjectGuid"].Value != string.Empty) ObjectGuid = new Guid(regexMatchAce.Groups["ObjectGuid"].Value);
             if (regexMatchAce.Groups["InheritObjectGuid"].Value != string.Empty) InheritObjectGuid = new Guid(regexMatchAce.Groups["InheritObjectGuid"].Value);
+        }
+
+        public string ToSDDL()
+        {
+            var sb = new StringBuilder();
+            sb.Append('(');
+            sb.Append(SddlMapping.AceTypeMapping.Inverse[Type]);
+            sb.Append(';');
+
+            if (((byte)Flags | 0xDF) != 0xDF) sb.Append(Flags.ToString());
+            foreach(var flag in SddlMapping.AceFlagsMapping.Inverse.Keys)
+            {
+                if (flag == AceFlags.None) continue;
+                if ((Flags & flag) != 0) sb.Append(SddlMapping.AceFlagsMapping.Inverse[flag]);
+            }
+            sb.Append(';');
+
+            sb.Append(AccessMask.ToSDDL());
+            sb.Append(';');
+
+            if(ObjectGuid != Guid.Empty)
+            {
+                sb.Append(ObjectGuid);
+            }
+            sb.Append(';');
+
+            if (InheritObjectGuid != Guid.Empty)
+            {
+                sb.Append(InheritObjectGuid);
+            }
+            sb.Append(';');
+
+            sb.Append(Trustee.SddlName);
+            
+            sb.Append(')');
+            return sb.ToString();
         }
     }
 }

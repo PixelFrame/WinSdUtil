@@ -32,12 +32,12 @@ namespace WinSdUtil.Lib.Model
                 Flags |= ControlFlags.SystemAclPresent;
             }
 
-            if ((Flags & ControlFlags.DiscretionaryAclPresent) == ControlFlags.DiscretionaryAclPresent)
+            if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
             {
                 DAclAces = sddl.DAclAces.Select(a => new AccessControlEntry(a)).ToArray();
             }
 
-            if ((Flags & ControlFlags.SystemAclPresent) == ControlFlags.SystemAclPresent)
+            if ((Flags & ControlFlags.SystemAclPresent) != 0)
             {
                 SAclAces = sddl.SAclAces.Select(a => new AccessControlEntry(a)).ToArray();
             }
@@ -64,7 +64,42 @@ namespace WinSdUtil.Lib.Model
         public SDDL ToSDDL()
         {
             var sddl = new SDDL();
-            throw new NotImplementedException();
+            if (Owner != null) { sddl.Owner = Owner.SddlName; }
+            if (Group != null) { sddl.Group = Group.SddlName; }
+
+            if ((Flags & ControlFlags.DiscretionaryAclProtected) != 0)
+                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclProtected];
+            if ((Flags & ControlFlags.DiscretionaryAclAutoInheritRequired) != 0)
+                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInheritRequired];
+            if ((Flags & ControlFlags.DiscretionaryAclAutoInherited) != 0) 
+                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInherited];
+
+            if ((Flags & ControlFlags.SystemAclProtected) != 0)
+                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclProtected];
+            if ((Flags & ControlFlags.SystemAclAutoInheritRequired) != 0)
+                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInheritRequired];
+            if ((Flags & ControlFlags.SystemAclAutoInherited) != 0)
+                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInherited];
+
+            if (DAclAces != null)
+            {
+                sddl.DAclAces = new string[DAclAces.Length];
+                for (int i = 0; i < DAclAces.Length; ++i)
+                {
+                    sddl.DAclAces[i] = DAclAces[i].ToSDDL();
+                }
+            }
+
+            if (SAclAces != null)
+            {
+                sddl.SAclAces = new string[SAclAces.Length];
+                for (int i = 0; i < SAclAces.Length; ++i)
+                {
+                    sddl.SAclAces[i] = SAclAces[i].ToSDDL();
+                }
+            }
+
+            return sddl;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace WinSdUtil.Lib.Model
+﻿using System.Text;
+
+namespace WinSdUtil.Lib.Model
 {
     [Flags]
     public enum AccessMask_Standard : uint
@@ -206,6 +208,28 @@
             }
 
             return list;
+        }
+
+        public string ToSDDL()
+        {
+            if (SddlMapping.AccessMaskMapping.Inverse.TryGetValue(Full, out string right))
+            {
+                return right;
+            }
+
+            if ((Full | 0xF00F01FF) != 0xF00F01FF)
+            {
+                return Full.ToString();
+            }
+            
+            var sb = new StringBuilder();
+            uint mask = 0x1;
+            for (int i = 0; i < 31; ++i)
+            {
+                if ((Full & mask) != 0) sb.Append(SddlMapping.AccessMaskMapping.Inverse[mask]);
+                mask <<= 1;
+            }
+            return sb.ToString();
         }
     }
 }

@@ -39,4 +39,22 @@
             }
         }
     }
+
+    internal static class ArrayExtensions
+    {
+        public static T[] RangeSubset<T>(this T[] array, int startIndex)
+        {
+            var length = array.Length - startIndex;
+            T[] subset = new T[length];
+            Array.Copy(array, startIndex, subset, 0, length);
+            return subset;
+        }
+
+        public static T[] RangeSubset<T>(this T[] array, int startIndex, int length)
+        {
+            T[] subset = new T[length];
+            Array.Copy(array, startIndex, subset, 0, length);
+            return subset;
+        }
+    }
 }

@@ -5,12 +5,12 @@ namespace WinSdUtil.Lib.Model.Binary
     [StructLayout(LayoutKind.Sequential)]
     internal struct SidIdentifierAuthority
     {
-        byte b0;
-        byte b1;
-        byte b2;
-        byte b3;
-        byte b4;
-        byte b5;
+        internal byte b0;
+        internal byte b1;
+        internal byte b2;
+        internal byte b3;
+        internal byte b4;
+        internal byte b5;
 
         internal SidIdentifierAuthority(byte[] blob, int offset)
         {

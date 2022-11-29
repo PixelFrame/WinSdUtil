@@ -5,9 +5,9 @@ namespace WinSdUtil.Lib.Model.Binary
     [StructLayout(LayoutKind.Sequential)]
     internal struct ACE
     {
-        AceHeader Header;
-        uint Mask;
-        SID Sid;
+        internal AceHeader Header;
+        internal uint Mask;
+        internal SID Sid;
     }
 
     [StructLayout(LayoutKind.Sequential)]

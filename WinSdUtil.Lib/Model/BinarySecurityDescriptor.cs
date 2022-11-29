@@ -6,6 +6,8 @@ namespace WinSdUtil.Lib.Model
     {
         public byte[] Value { get; set; }
 
+        public byte[] ValueInternal { get => SD.GetBytes(); }
+
         public BinarySecurityDescriptor(byte[] value) { Value = value; SD = new(value); }
 
         public SDDL ToSDDL() { return new SDDL(this); }

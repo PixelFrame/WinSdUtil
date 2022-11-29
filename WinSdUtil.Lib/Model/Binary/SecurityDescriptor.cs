@@ -13,10 +13,10 @@ namespace WinSdUtil.Lib.Model.Binary
         internal uint OffsetGroup;
         internal uint OffsetSacl;
         internal uint OffsetDacl;
-        internal SID OwnerSid;
-        internal SID GroupSid;
         internal ACL SACL;
         internal ACL DACL;
+        internal SID OwnerSid;
+        internal SID GroupSid;
 
         internal SecurityDescriptor(byte[] blob)
         {
@@ -27,10 +27,29 @@ namespace WinSdUtil.Lib.Model.Binary
             OffsetGroup = BitConverter.ToUInt32(blob, 8);
             OffsetSacl = BitConverter.ToUInt32(blob, 12);
             OffsetDacl = BitConverter.ToUInt32(blob, 16);
-            OwnerSid = new SID(blob, (int)OffsetOwner);
-            GroupSid = new SID(blob, (int)OffsetGroup);
             SACL = new ACL(blob, (int)OffsetSacl);
             DACL = new ACL(blob, (int)OffsetDacl);
+            OwnerSid = new SID(blob, (int)OffsetOwner);
+            GroupSid = new SID(blob, (int)OffsetGroup);
+        }
+
+        internal byte[] GetBytes()
+        {
+            int size = 20 + SACL.AclSize + DACL.AclSize + 8 + OwnerSid.SubAuthorityCount * 4 + 8 + GroupSid.SubAuthorityCount * 4;
+            byte[] arr = new byte[size];
+            arr[0] = Revision; 
+            arr[1] = Sbz1;
+            BitConverter.GetBytes(Control) .CopyTo(arr, 2);
+            BitConverter.GetBytes(OffsetOwner).CopyTo(arr, 4);
+            BitConverter.GetBytes(OffsetGroup).CopyTo(arr, 8);
+            BitConverter.GetBytes(OffsetSacl).CopyTo(arr, 12);
+            BitConverter.GetBytes(OffsetDacl).CopyTo(arr, 16);
+            SACL.GetBytes(ref arr, (int)OffsetSacl);
+            DACL.GetBytes(ref arr, (int)OffsetDacl);
+            OwnerSid.GetBytes(ref arr, (int)OffsetOwner);
+            GroupSid.GetBytes(ref arr, (int)OffsetGroup);
+
+            return arr;
         }
     }
 }

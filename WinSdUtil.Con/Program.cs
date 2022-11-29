@@ -4,6 +4,7 @@ var sddl = new SDDL("O:SYG:SYD:(A;;RPWPCCDCLCRCWOWDSDSW;;;SY)(A;;RPWPCCDCLCRCWOW
 Console.WriteLine(sddl.Value);
 var binsd = sddl.ToBinarySd();
 Console.WriteLine(BitConverter.ToString(binsd.Value));
+Console.WriteLine(BitConverter.ToString(binsd.ValueInternal));
 var acl = sddl.ToACL();
 var convertedSddl = acl.ToSDDL();
 Console.WriteLine(convertedSddl.Value);

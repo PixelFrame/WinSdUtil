@@ -18,19 +18,21 @@ namespace WinSdUtil.Lib.Model
             if (sddl.Group.Length == 0) Group = null;
             else Group = new Trustee(sddl.Group, 0);
 
-            if (sddl.DAclFlags.Contains("NO_ACCESS_CONTROL")) Flags ^= ControlFlags.DiscretionaryAclPresent;
+            if (sddl.DAclFlags.Contains("NO_ACCESS_CONTROL") || sddl.DAclAces.Length == 0) Flags &= ~ControlFlags.DiscretionaryAclPresent;
             else
             {
                 Flags |= parseSddlControlFlags(sddl.DAclFlags, 0);
                 Flags |= ControlFlags.DiscretionaryAclPresent;
             }
 
-            if (sddl.SAclFlags.Contains("NO_ACCESS_CONTROL")) Flags ^= ControlFlags.SystemAclPresent;
+            if (sddl.SAclFlags.Contains("NO_ACCESS_CONTROL") || sddl.SAclAces.Length == 0) Flags &= ~ControlFlags.SystemAclPresent;
             else
             {
                 Flags |= parseSddlControlFlags(sddl.SAclFlags, 1);
                 Flags |= ControlFlags.SystemAclPresent;
             }
+
+            Flags |= ControlFlags.SelfRelative;
 
             if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
             {
@@ -47,8 +49,8 @@ namespace WinSdUtil.Lib.Model
 
         internal AccessControlList(SecurityDescriptor sd)
         {
-            Owner = new Trustee(sd.OwnerSid.ToString(), 1);
-            Group = new Trustee(sd.GroupSid.ToString(), 1);
+            if (sd.OwnerSid.Revision == 1) Owner = new Trustee(sd.OwnerSid.ToString(), 1);
+            if (sd.GroupSid.Revision == 1) Group = new Trustee(sd.GroupSid.ToString(), 1);
             Flags = (ControlFlags)sd.Control;
             if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
             {
@@ -96,7 +98,7 @@ namespace WinSdUtil.Lib.Model
             sd.Control = (ushort)Flags;
             uint offset = 20;
 
-            if (SAclAces != null)
+            if (SAclAces != null && SAclAces.Length > 0)
             {
                 sd.OffsetSacl = offset;
                 var sacl = new ACL();
@@ -116,7 +118,7 @@ namespace WinSdUtil.Lib.Model
                 sd.OffsetSacl = 0;
             }
 
-            if (DAclAces != null)
+            if (DAclAces != null && DAclAces.Length > 0)
             {
                 sd.OffsetDacl = offset;
                 var dacl = new ACL();

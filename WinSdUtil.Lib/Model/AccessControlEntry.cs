@@ -70,7 +70,7 @@ namespace WinSdUtil.Lib.Model
             sb.Append(';');
 
             if (((byte)Flags | 0xDF) != 0xDF) sb.Append(Flags.ToString());
-            foreach(var flag in SddlMapping.AceFlagsMapping.Inverse.Keys)
+            foreach (var flag in SddlMapping.AceFlagsMapping.Inverse.Keys)
             {
                 if (flag == AceFlags.None) continue;
                 if ((Flags & flag) != 0) sb.Append(SddlMapping.AceFlagsMapping.Inverse[flag]);
@@ -80,7 +80,7 @@ namespace WinSdUtil.Lib.Model
             sb.Append(Mask.ToSDDL());
             sb.Append(';');
 
-            if(ObjectGuid != Guid.Empty)
+            if (ObjectGuid != Guid.Empty)
             {
                 sb.Append(ObjectGuid);
             }
@@ -93,7 +93,7 @@ namespace WinSdUtil.Lib.Model
             sb.Append(';');
 
             sb.Append(Trustee.SddlName);
-            
+
             sb.Append(')');
             return sb.ToString();
         }
@@ -119,7 +119,7 @@ namespace WinSdUtil.Lib.Model
                 case AceType.SystemAlarmObject:
                     var aceObj = new ACE_Object();
                     aceObj.Header.AceType = (byte)Type;
-                    aceObj.Header.AceFlags|= (byte)Flags;
+                    aceObj.Header.AceFlags |= (byte)Flags;
                     aceObj.Mask = Mask.Full;
                     if (ObjectGuid != Guid.Empty)
                     {

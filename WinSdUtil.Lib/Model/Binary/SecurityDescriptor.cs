@@ -19,8 +19,8 @@ namespace WinSdUtil.Lib.Model.Binary
 
         internal SecurityDescriptor(byte[] blob)
         {
-            Revision= blob[0];
-            Sbz1= blob[1];
+            Revision = blob[0];
+            Sbz1 = blob[1];
             Control = BitConverter.ToUInt16(blob, 2);
             OffsetOwner = BitConverter.ToUInt32(blob, 4);
             OffsetGroup = BitConverter.ToUInt32(blob, 8);
@@ -38,9 +38,9 @@ namespace WinSdUtil.Lib.Model.Binary
             if (((ControlFlags)Control & ControlFlags.SystemAclPresent) != 0) size += SACL.AclSize;
             if (((ControlFlags)Control & ControlFlags.DiscretionaryAclPresent) != 0) size += DACL.AclSize;
             byte[] arr = new byte[size];
-            arr[0] = Revision; 
+            arr[0] = Revision;
             arr[1] = Sbz1;
-            BitConverter.GetBytes(Control) .CopyTo(arr, 2);
+            BitConverter.GetBytes(Control).CopyTo(arr, 2);
             BitConverter.GetBytes(OffsetOwner).CopyTo(arr, 4);
             BitConverter.GetBytes(OffsetGroup).CopyTo(arr, 8);
             BitConverter.GetBytes(OffsetSacl).CopyTo(arr, 12);

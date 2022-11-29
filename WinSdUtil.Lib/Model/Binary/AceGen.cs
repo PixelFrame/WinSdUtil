@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using WinSdUtil.Lib.Helper;
+﻿using WinSdUtil.Lib.Helper;
 
 namespace WinSdUtil.Lib.Model.Binary
 {
@@ -8,8 +7,8 @@ namespace WinSdUtil.Lib.Model.Binary
         internal static List<ACE_Callback_Object> FromBytes(in byte[] bytes, int offset, int length)
         {
             var result = new List<ACE_Callback_Object>();
-            var offsetLimit = offset + length; 
-            while(offset < offsetLimit)
+            var offsetLimit = offset + length;
+            while (offset < offsetLimit)
             {
                 var newAce = new ACE_Callback_Object();
                 newAce.Header = new AceHeader()
@@ -18,7 +17,7 @@ namespace WinSdUtil.Lib.Model.Binary
                     AceFlags = bytes[offset + 1],
                     AceSize = BitConverter.ToUInt16(bytes, offset + 2),
                 };
-                switch((AceType)newAce.Header.AceType)
+                switch ((AceType)newAce.Header.AceType)
                 {
                     case AceType.AccessAllowed:
                     case AceType.AccessDenied:
@@ -80,7 +79,7 @@ namespace WinSdUtil.Lib.Model.Binary
                             newAce.InheritedObjectType = new Guid(bytes.RangeSubset(__offset, 16));
                             __offset += 16;
                         }
-                        newAce.Sid = new SID(bytes, __offset); 
+                        newAce.Sid = new SID(bytes, __offset);
                         var __sidLen = 8 + 4 * newAce.Sid.SubAuthorityCount;
                         var __appDataLen = newAce.Header.AceSize - (__offset - offset) - __sidLen;
                         newAce.ApplicationData = new byte[__appDataLen];

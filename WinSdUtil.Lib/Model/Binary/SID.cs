@@ -27,7 +27,7 @@ namespace WinSdUtil.Lib.Model.Binary
             Marshal.StructureToPtr(IdentifierAuthority, identifierAuthorityPtr, false);
             Marshal.Copy(identifierAuthorityPtr, target, offset + 2, 6);
             Marshal.FreeHGlobal(identifierAuthorityPtr);
-            Buffer.BlockCopy(SubAuthority, 0, target, offset + 8, SubAuthorityCount);
+            Buffer.BlockCopy(SubAuthority, 0, target, offset + 8, SubAuthorityCount * 4);
             return (8 + 4 * SubAuthorityCount);
         }
 

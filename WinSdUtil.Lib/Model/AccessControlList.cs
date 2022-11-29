@@ -50,7 +50,7 @@ namespace WinSdUtil.Lib.Model
             Owner = new Trustee(sd.OwnerSid.ToString(), 1);
             Group = new Trustee(sd.GroupSid.ToString(), 1);
             Flags = (ControlFlags)sd.Control;
-            if((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
+            if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
             {
                 DAclAces = AceGen.FromBytes(sd.DACL.Aces, 0, sd.DACL.Aces.Length).Select(x => x.ToManagedAce()).ToArray();
             }

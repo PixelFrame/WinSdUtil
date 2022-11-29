@@ -20,7 +20,7 @@ namespace WinSdUtil.Lib.Model
         {
             using var context = new LibDbContext();
             Trustee? dbResult = null;
-            if (Type==0) dbResult = context.Trustees.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
+            if (Type == 0) dbResult = context.Trustees.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
             else dbResult = context.Trustees.FirstOrDefault(t => t.Sid == SddlTrusteeOrSid);
             if (dbResult == null)
             {

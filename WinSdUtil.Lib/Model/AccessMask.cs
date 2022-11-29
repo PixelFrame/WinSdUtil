@@ -221,7 +221,7 @@ namespace WinSdUtil.Lib.Model
             {
                 return Full.ToString();
             }
-            
+
             var sb = new StringBuilder();
             uint mask = 0x1;
             for (int i = 0; i < 31; ++i)

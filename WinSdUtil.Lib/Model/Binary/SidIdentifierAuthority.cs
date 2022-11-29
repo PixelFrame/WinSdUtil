@@ -47,7 +47,7 @@ namespace WinSdUtil.Lib.Model.Binary
 
         public override string ToString()
         {
-            var value = b0 << 40 + b1 << 32 + b2 << 24 + b3 << 16 + b4 << 8 + b5;
+            var value = (b0 << 40) + (b1 << 32) + (b2 << 24) + (b3 << 16) + (b4 << 8) + b5;
             return value.ToString();
         }
     }

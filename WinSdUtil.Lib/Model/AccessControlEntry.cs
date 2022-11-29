@@ -17,6 +17,7 @@ namespace WinSdUtil.Lib.Model
         public Trustee Trustee { get; set; } = new();
         public byte[] ApplicationData { get; set; } = Array.Empty<byte>();
 
+        public AccessControlEntry() { }
         public AccessControlEntry(string SddlAce)
         {
             var regexMatchAce = Regex.Match(SddlAce, RegexPatternAce);

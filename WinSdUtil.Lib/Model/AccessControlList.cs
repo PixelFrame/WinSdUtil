@@ -52,12 +52,11 @@ namespace WinSdUtil.Lib.Model
             Flags = (ControlFlags)sd.Control;
             if((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
             {
-                DAclAces = new AccessControlEntry[sd.DACL.AceCount];
-                //TODO
+                DAclAces = AceGen.FromBytes(sd.DACL.Aces, 0, sd.DACL.Aces.Length).Select(x => x.ToManagedAce()).ToArray();
             }
             if ((Flags & ControlFlags.SystemAclPresent) != 0)
             {
-                SAclAces = new AccessControlEntry[sd.SACL.AceCount];
+                SAclAces = AceGen.FromBytes(sd.SACL.Aces, 0, sd.SACL.Aces.Length).Select(x => x.ToManagedAce()).ToArray();
             }
         }
 

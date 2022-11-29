@@ -4,16 +4,16 @@ namespace WinSdUtil.Lib.Model
 {
     public class BinarySecurityDescriptor
     {
-        public byte[] Value { get; set; }
+        public byte[] Value { get => SD.GetBytes(); set { SD = new(value); } }
+        internal SecurityDescriptor SD { get; set; }
 
-        public byte[] ValueInternal { get => SD.GetBytes(); }
+        public BinarySecurityDescriptor(byte[] value) { Value = value;}
 
-        public BinarySecurityDescriptor(byte[] value) { Value = value; SD = new(value); }
+        public SDDL ToSDDL() { return this.ToACL().ToSDDL(); }
 
-        public SDDL ToSDDL() { return new SDDL(this); }
-
-        public AccessControlList ToACL() { return this.ToSDDL().ToACL(); }
-
-        internal SecurityDescriptor SD;
+        public AccessControlList ToACL() 
+        {
+            return new AccessControlList(this);
+        }
     }
 }

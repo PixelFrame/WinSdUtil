@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using WinSdUtil.Lib.Helper;
 
 namespace WinSdUtil.Lib.Model.Binary
 {
@@ -35,7 +34,9 @@ namespace WinSdUtil.Lib.Model.Binary
 
         internal byte[] GetBytes()
         {
-            int size = 20 + SACL.AclSize + DACL.AclSize + 8 + OwnerSid.SubAuthorityCount * 4 + 8 + GroupSid.SubAuthorityCount * 4;
+            int size = 20 + 8 + OwnerSid.SubAuthorityCount * 4 + 8 + GroupSid.SubAuthorityCount * 4;
+            if (((ControlFlags)Control & ControlFlags.SystemAclPresent) != 0) size += SACL.AclSize;
+            if (((ControlFlags)Control & ControlFlags.DiscretionaryAclPresent) != 0) size += DACL.AclSize;
             byte[] arr = new byte[size];
             arr[0] = Revision; 
             arr[1] = Sbz1;
@@ -44,8 +45,8 @@ namespace WinSdUtil.Lib.Model.Binary
             BitConverter.GetBytes(OffsetGroup).CopyTo(arr, 8);
             BitConverter.GetBytes(OffsetSacl).CopyTo(arr, 12);
             BitConverter.GetBytes(OffsetDacl).CopyTo(arr, 16);
-            SACL.GetBytes(ref arr, (int)OffsetSacl);
-            DACL.GetBytes(ref arr, (int)OffsetDacl);
+            if (((ControlFlags)Control & ControlFlags.SystemAclPresent) != 0) SACL.GetBytes(ref arr, (int)OffsetSacl);
+            if (((ControlFlags)Control & ControlFlags.DiscretionaryAclPresent) != 0) DACL.GetBytes(ref arr, (int)OffsetDacl);
             OwnerSid.GetBytes(ref arr, (int)OffsetOwner);
             GroupSid.GetBytes(ref arr, (int)OffsetGroup);
 

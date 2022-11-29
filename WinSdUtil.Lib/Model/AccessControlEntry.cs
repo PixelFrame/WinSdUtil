@@ -1,7 +1,7 @@
-﻿using System.Security.AccessControl;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using WinSdUtil.Lib.Helper;
+using WinSdUtil.Lib.Model.Binary;
 
 namespace WinSdUtil.Lib.Model
 {
@@ -11,10 +11,11 @@ namespace WinSdUtil.Lib.Model
 
         public AceType Type { get; set; } = 0;
         public AceFlags Flags { get; set; } = 0;
-        public AccessMask AccessMask { get; set; } = new();
+        public AccessMask Mask { get; set; } = new();
         public Guid ObjectGuid { get; set; }
         public Guid InheritObjectGuid { get; set; }
         public Trustee Trustee { get; set; } = new();
+        public byte[] ApplicationData { get; set; } = Array.Empty<byte>();
 
         public AccessControlEntry(string SddlAce)
         {
@@ -36,13 +37,13 @@ namespace WinSdUtil.Lib.Model
                 Flags |= flag;
             }
 
-            AccessMask.Full = 0;
+            Mask.Full = 0;
             var sddlRights = regexMatchAce.Groups["Rights"].Value;
             if (Regex.IsMatch(sddlRights, @"\d+"))
             {
                 if (!uint.TryParse(sddlRights, out uint accessMask))
                 { throw new ArgumentException($"Invalid ACE Right: {sddlRights}"); }
-                AccessMask.Full = accessMask;
+                Mask.Full = accessMask;
             }
             else
             {
@@ -50,17 +51,17 @@ namespace WinSdUtil.Lib.Model
                 foreach (var sddlRight in sddlRightsList)
                 {
                     if (!SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out uint accessBit)) { throw new ArgumentException($"Invalid ACE Right: {sddlRight}"); }
-                    AccessMask.Full |= accessBit;
+                    Mask.Full |= accessBit;
                 }
             }
 
-            Trustee = new(regexMatchAce.Groups["AccountSid"].Value);
+            Trustee = new(regexMatchAce.Groups["AccountSid"].Value, 0);
 
             if (regexMatchAce.Groups["ObjectGuid"].Value != string.Empty) ObjectGuid = new Guid(regexMatchAce.Groups["ObjectGuid"].Value);
             if (regexMatchAce.Groups["InheritObjectGuid"].Value != string.Empty) InheritObjectGuid = new Guid(regexMatchAce.Groups["InheritObjectGuid"].Value);
         }
 
-        public string ToSDDL()
+        public string GetSDDL()
         {
             var sb = new StringBuilder();
             sb.Append('(');
@@ -75,7 +76,7 @@ namespace WinSdUtil.Lib.Model
             }
             sb.Append(';');
 
-            sb.Append(AccessMask.ToSDDL());
+            sb.Append(Mask.ToSDDL());
             sb.Append(';');
 
             if(ObjectGuid != Guid.Empty)
@@ -94,6 +95,85 @@ namespace WinSdUtil.Lib.Model
             
             sb.Append(')');
             return sb.ToString();
+        }
+
+        internal byte[] ToBinary()
+        {
+            switch (Type)
+            {
+                case AceType.AccessAllowed:
+                case AceType.AccessDenied:
+                case AceType.SystemAudit:
+                case AceType.SystemAlarm:
+                    var ace = new ACE();
+                    ace.Header.AceType = (byte)Type;
+                    ace.Header.AceFlags = (byte)Flags;
+                    ace.Mask = Mask.Full;
+                    ace.Sid = Trustee.ToBinarySid();
+                    ace.Header.AceSize = (ushort)(16 + 4 * ace.Sid.SubAuthorityCount);
+                    return ace.GetBytes();
+                case AceType.AccessAllowedObject:
+                case AceType.AccessDeniedObject:
+                case AceType.SystemAuditObject:
+                case AceType.SystemAlarmObject:
+                    var aceObj = new ACE_Object();
+                    aceObj.Header.AceType = (byte)Type;
+                    aceObj.Header.AceFlags|= (byte)Flags;
+                    aceObj.Mask = Mask.Full;
+                    if (ObjectGuid != Guid.Empty)
+                    {
+                        aceObj.Flags |= 0x1;
+                        aceObj.ObjectType = ObjectGuid;
+                        aceObj.Header.AceSize += 16;
+                    }
+                    if (InheritObjectGuid != Guid.Empty)
+                    {
+                        aceObj.Flags |= 0x2;
+                        aceObj.InheritedObjectType = InheritObjectGuid;
+                        aceObj.Header.AceSize += 16;
+                    }
+                    aceObj.Sid = Trustee.ToBinarySid();
+                    aceObj.Header.AceSize += (ushort)(20 + 4 * aceObj.Sid.SubAuthorityCount);
+                    return aceObj.GetBytes();
+                case AceType.AccessAllowedCallback:
+                case AceType.AccessDeniedCallback:
+                case AceType.SystemAuditCallback:
+                case AceType.SystemAlarmCallback:
+                    var aceCb = new ACE_Callback();
+                    aceCb.Header.AceType = (byte)Type;
+                    aceCb.Header.AceFlags = (byte)Flags;
+                    aceCb.Mask = Mask.Full;
+                    aceCb.Sid = Trustee.ToBinarySid();
+                    aceCb.ApplicationData = ApplicationData;
+                    aceCb.Header.AceSize = (ushort)(16 + 4 * aceCb.Sid.SubAuthorityCount + ApplicationData.Length);
+                    return aceCb.GetBytes();
+                case AceType.AccessAllowedCallbackObject:
+                case AceType.AccessDeniedCallbackObject:
+                case AceType.SystemAuditCallbackObject:
+                case AceType.SystemAlarmCallbackObject:
+                    var aceCbObj = new ACE_Callback_Object();
+                    aceCbObj.Header.AceType = (byte)Type;
+                    aceCbObj.Header.AceFlags |= (byte)Flags;
+                    aceCbObj.Mask = Mask.Full;
+                    if (ObjectGuid != Guid.Empty)
+                    {
+                        aceCbObj.Flags |= 0x1;
+                        aceCbObj.ObjectType = ObjectGuid;
+                        aceCbObj.Header.AceSize += 16;
+                    }
+                    if (InheritObjectGuid != Guid.Empty)
+                    {
+                        aceCbObj.Flags |= 0x2;
+                        aceCbObj.InheritedObjectType = InheritObjectGuid;
+                        aceCbObj.Header.AceSize += 16;
+                    }
+                    aceCbObj.Sid = Trustee.ToBinarySid();
+                    aceCbObj.ApplicationData = ApplicationData;
+                    aceCbObj.Header.AceSize += (ushort)(20 + 4 * aceCbObj.Sid.SubAuthorityCount + ApplicationData.Length);
+                    return aceCbObj.GetBytes();
+                default:
+                    throw new NotImplementedException($"The specified ACE type ({Type}) is not supported to be converted to binary.");
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace WinSdUtil.Lib.Model
+﻿namespace WinSdUtil.Lib.Model
 {
     internal static class SddlMapping
     {

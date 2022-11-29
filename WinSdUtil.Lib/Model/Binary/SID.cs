@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using WinSdUtil.Lib.Helper;
 
 namespace WinSdUtil.Lib.Model.Binary
 {
@@ -20,7 +19,7 @@ namespace WinSdUtil.Lib.Model.Binary
             Buffer.BlockCopy(blob, offset + 8, SubAuthority, 0, SubAuthorityCount * 4);
         }
 
-        internal void GetBytes(ref byte[] target, int offset)
+        internal int GetBytes(ref byte[] target, int offset)
         {
             target[offset] = Revision;
             target[offset + 1] = SubAuthorityCount;
@@ -29,6 +28,12 @@ namespace WinSdUtil.Lib.Model.Binary
             Marshal.Copy(identifierAuthorityPtr, target, offset + 2, 6);
             Marshal.FreeHGlobal(identifierAuthorityPtr);
             Buffer.BlockCopy(SubAuthority, 0, target, offset + 8, SubAuthorityCount);
+            return (8 + 4 * SubAuthorityCount);
+        }
+
+        public override string ToString()
+        {
+            return $"S-{Revision}-{IdentifierAuthority}" + SubAuthority.Select(x => $"-{x}").Aggregate((x, y) => $"{x}{y}");
         }
     }
 }

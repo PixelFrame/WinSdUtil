@@ -1,4 +1,4 @@
-﻿using System.Security.AccessControl;
+﻿using WinSdUtil.Lib.Model.Binary;
 
 namespace WinSdUtil.Lib.Model
 {
@@ -13,10 +13,10 @@ namespace WinSdUtil.Lib.Model
         public AccessControlList(SDDL sddl)
         {
             if (sddl.Owner.Length == 0) Owner = null;
-            else Owner = new Trustee(sddl.Owner);
+            else Owner = new Trustee(sddl.Owner, 0);
 
             if (sddl.Group.Length == 0) Group = null;
-            else Group = new Trustee(sddl.Group);
+            else Group = new Trustee(sddl.Group, 0);
 
             if (sddl.DAclFlags.Contains("NO_ACCESS_CONTROL")) Flags ^= ControlFlags.DiscretionaryAclPresent;
             else
@@ -43,6 +43,24 @@ namespace WinSdUtil.Lib.Model
             }
         }
 
+        public AccessControlList(BinarySecurityDescriptor binsd) : this(binsd.SD) { }
+
+        internal AccessControlList(SecurityDescriptor sd)
+        {
+            Owner = new Trustee(sd.OwnerSid.ToString(), 1);
+            Group = new Trustee(sd.GroupSid.ToString(), 1);
+            Flags = (ControlFlags)sd.Control;
+            if((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
+            {
+                DAclAces = new AccessControlEntry[sd.DACL.AceCount];
+                //TODO
+            }
+            if ((Flags & ControlFlags.SystemAclPresent) != 0)
+            {
+                SAclAces = new AccessControlEntry[sd.SACL.AceCount];
+            }
+        }
+
         private ControlFlags parseSddlControlFlags(string sddlControlFlags, int type)
         {
             ControlFlags result = 0;
@@ -63,43 +81,77 @@ namespace WinSdUtil.Lib.Model
 
         public SDDL ToSDDL()
         {
-            var sddl = new SDDL();
-            if (Owner != null) { sddl.Owner = Owner.SddlName; }
-            if (Group != null) { sddl.Group = Group.SddlName; }
+            return new SDDL(this);
+        }
 
-            if ((Flags & ControlFlags.DiscretionaryAclProtected) != 0)
-                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclProtected];
-            if ((Flags & ControlFlags.DiscretionaryAclAutoInheritRequired) != 0)
-                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInheritRequired];
-            if ((Flags & ControlFlags.DiscretionaryAclAutoInherited) != 0) 
-                sddl.DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInherited];
+        public BinarySecurityDescriptor ToBinarySd()
+        {
+            return new BinarySecurityDescriptor(this.ToBinary().GetBytes());
+        }
 
-            if ((Flags & ControlFlags.SystemAclProtected) != 0)
-                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclProtected];
-            if ((Flags & ControlFlags.SystemAclAutoInheritRequired) != 0)
-                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInheritRequired];
-            if ((Flags & ControlFlags.SystemAclAutoInherited) != 0)
-                sddl.SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInherited];
-
-            if (DAclAces != null)
-            {
-                sddl.DAclAces = new string[DAclAces.Length];
-                for (int i = 0; i < DAclAces.Length; ++i)
-                {
-                    sddl.DAclAces[i] = DAclAces[i].ToSDDL();
-                }
-            }
+        internal SecurityDescriptor ToBinary()
+        {
+            var sd = new SecurityDescriptor();
+            sd.Revision = 1;
+            sd.Sbz1 = 0;
+            sd.Control = (ushort)Flags;
+            uint offset = 20;
 
             if (SAclAces != null)
             {
-                sddl.SAclAces = new string[SAclAces.Length];
-                for (int i = 0; i < SAclAces.Length; ++i)
-                {
-                    sddl.SAclAces[i] = SAclAces[i].ToSDDL();
-                }
+                sd.OffsetSacl = offset;
+                var sacl = new ACL();
+                sacl.AclRevision = 2;
+                sacl.Sbz1 = 0;
+                sacl.AceCount = (ushort)SAclAces.Length;
+                var aceBytes = SAclAces
+                    .Select(x => x.ToBinary())
+                    .Aggregate((x, y) => x.Concat(y).ToArray());
+                sacl.Aces = aceBytes;
+                sacl.AclSize = (ushort)(8 + aceBytes.Length);
+                sd.SACL = sacl;
+                offset += sacl.AclSize;
+            }
+            else
+            {
+                sd.OffsetSacl = 0;
             }
 
-            return sddl;
+            if (DAclAces != null)
+            {
+                sd.OffsetDacl = offset;
+                var dacl = new ACL();
+                dacl.AclRevision = 2;
+                dacl.Sbz1 = 0;
+                dacl.AceCount = (ushort)DAclAces.Length;
+                var aceBytes = DAclAces
+                    .Select(x => x.ToBinary())
+                    .Aggregate((x, y) => x.Concat(y).ToArray());
+                dacl.Aces = aceBytes;
+                dacl.AclSize = (ushort)(8 + aceBytes.Length);
+                sd.DACL = dacl;
+                offset += dacl.AclSize;
+            }
+            else
+            {
+                sd.OffsetDacl = 0;
+            }
+
+            if (Owner != null)
+            {
+                sd.OffsetOwner = offset;
+                sd.OwnerSid = Owner.ToBinarySid();
+                offset += (uint)(8 + sd.OwnerSid.SubAuthorityCount * 4);
+            }
+
+            if (Group != null)
+            {
+                sd.OffsetGroup = offset;
+                sd.GroupSid = Group.ToBinarySid();
+                offset += (uint)(8 + sd.GroupSid.SubAuthorityCount * 4);
+            }
+
+            return sd;
         }
     }
 }

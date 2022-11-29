@@ -1,6 +1,6 @@
 ﻿# WinSdUtil.Lib
 Provide offline Windows security descriptor translation
+No Windows runtime platform dependency
 
 Current roadmap:
-
-Managed object <-> SDDL <-WMI-> Binary SD
+Binary <-> Managed object <-> SDDL

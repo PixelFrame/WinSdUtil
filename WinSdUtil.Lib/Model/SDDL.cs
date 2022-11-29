@@ -1,5 +1,4 @@
-﻿using System.Management;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace WinSdUtil.Lib.Model
@@ -49,23 +48,47 @@ namespace WinSdUtil.Lib.Model
 
         public SDDL() { }
 
-        public SDDL(BinarySecurityDescriptor BinarySd) : this(BinarySd.Value) { }
-
-        private SDDL(byte[] Binary)
-        {
-            using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
-
-            var inparam = Win32SdHelper.GetMethodParameters("BinarySDToSDDL");
-            inparam["BinarySD"] = Binary;
-            var outparam = Win32SdHelper.InvokeMethod("BinarySDToSDDL", inparam, null);
-            var rtValue = (uint)outparam["ReturnValue"];
-            Value = (string)outparam["SDDL"];
-            if (rtValue != 0) { throw new ArgumentException($"Given byte array is not valid Windows SD. Win32 error: {rtValue}"); }
-        }
-
         public SDDL(string SddlString)
         {
             Value = SddlString;
+        }
+
+        public SDDL(AccessControlList acl)
+        {
+            if (acl.Owner != null) { Owner = acl.Owner.SddlName; }
+            if (acl.Group != null) { Group = acl.Group.SddlName; }
+
+            if ((acl.Flags & ControlFlags.DiscretionaryAclProtected) != 0)
+                DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclProtected];
+            if ((acl.Flags & ControlFlags.DiscretionaryAclAutoInheritRequired) != 0)
+                DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInheritRequired];
+            if ((acl.Flags & ControlFlags.DiscretionaryAclAutoInherited) != 0)
+                DAclFlags += SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.DiscretionaryAclAutoInherited];
+
+            if ((acl.Flags & ControlFlags.SystemAclProtected) != 0)
+                SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclProtected];
+            if ((acl.Flags & ControlFlags.SystemAclAutoInheritRequired) != 0)
+                SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInheritRequired];
+            if ((acl.Flags & ControlFlags.SystemAclAutoInherited) != 0)
+                SAclFlags += SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.SystemAclAutoInherited];
+
+            if (acl.DAclAces != null)
+            {
+                DAclAces = new string[acl.DAclAces.Length];
+                for (int i = 0; i < acl.DAclAces.Length; ++i)
+                {
+                    DAclAces[i] = acl.DAclAces[i].GetSDDL();
+                }
+            }
+
+            if (acl.SAclAces != null)
+            {
+                SAclAces = new string[acl.SAclAces.Length];
+                for (int i = 0; i < acl.SAclAces.Length; ++i)
+                {
+                    SAclAces[i] = acl.SAclAces[i].GetSDDL();
+                }
+            }
         }
 
         public AccessControlList ToACL()
@@ -75,14 +98,7 @@ namespace WinSdUtil.Lib.Model
 
         public BinarySecurityDescriptor ToBinarySd()
         {
-            using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
-
-            var inparam = Win32SdHelper.GetMethodParameters("SDDLToBinarySD");
-            inparam["SDDL"] = this.Value;
-            var outparam = Win32SdHelper.InvokeMethod("SDDLToBinarySD", inparam, null);
-            var rtValue = (uint)outparam["ReturnValue"];
-            if (rtValue == 0) return new BinarySecurityDescriptor((byte[])outparam["BinarySD"]);
-            else { throw new ArgumentException($"Unable to convert SDDL \"{this.Value}\" to Binary SD. Win32 error: {rtValue}"); }
+            return this.ToACL().ToBinarySd();
         }
 
         public override string ToString()

@@ -85,7 +85,7 @@ namespace WinSdUtil.Lib.Model
 
         public BinarySecurityDescriptor ToBinarySd()
         {
-            return new BinarySecurityDescriptor(this.ToBinary().GetBytes());
+            return new BinarySecurityDescriptor(this.ToBinary());
         }
 
         internal SecurityDescriptor ToBinary()

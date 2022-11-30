@@ -17,7 +17,7 @@ namespace WinSdUtil.Lib.Model
                 if (DAclFlags.Length > 0) sb.Append($"{DAclFlags}");
                 foreach (var DAclAce in DAclAces) sb.Append(DAclAce);
                 if (SAclFlags.Length > 0 || SAclAces.Length > 0) sb.Append("S:");
-                if (SAclFlags.Length > 0) sb.Append($"S:{SAclFlags}");
+                if (SAclFlags.Length > 0) sb.Append($"{SAclFlags}");
                 foreach (var SAclAce in SAclAces) sb.Append(SAclAce);
                 return sb.ToString();
             }
@@ -80,6 +80,10 @@ namespace WinSdUtil.Lib.Model
                     DAclAces[i] = acl.DAclAces[i].GetSDDL();
                 }
             }
+            else if ((acl.Flags & ControlFlags.DiscretionaryAclPresent) != 0)
+            {
+                DAclFlags = SddlMapping.DAclFlagsMapping.Inverse[ControlFlags.None];
+            }
 
             if (acl.SAclAces != null)
             {
@@ -88,6 +92,10 @@ namespace WinSdUtil.Lib.Model
                 {
                     SAclAces[i] = acl.SAclAces[i].GetSDDL();
                 }
+            }
+            else if ((acl.Flags & ControlFlags.SystemAclPresent) != 0)
+            {
+                DAclFlags = SddlMapping.SAclFlagsMapping.Inverse[ControlFlags.None];
             }
         }
 

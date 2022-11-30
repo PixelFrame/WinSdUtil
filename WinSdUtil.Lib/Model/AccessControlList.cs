@@ -18,14 +18,16 @@ namespace WinSdUtil.Lib.Model
             if (sddl.Group.Length == 0) Group = null;
             else Group = new Trustee(sddl.Group, 0);
 
-            if (sddl.DAclFlags.Contains("NO_ACCESS_CONTROL") || sddl.DAclAces.Length == 0) Flags &= ~ControlFlags.DiscretionaryAclPresent;
+            if (sddl.DAclFlags.Contains("NO_ACCESS_CONTROL")) Flags |= ControlFlags.DiscretionaryAclPresent;
+            else if (sddl.DAclAces.Length == 0) Flags &= ~ControlFlags.DiscretionaryAclPresent;
             else
             {
                 Flags |= parseSddlControlFlags(sddl.DAclFlags, 0);
                 Flags |= ControlFlags.DiscretionaryAclPresent;
             }
 
-            if (sddl.SAclFlags.Contains("NO_ACCESS_CONTROL") || sddl.SAclAces.Length == 0) Flags &= ~ControlFlags.SystemAclPresent;
+            if (sddl.SAclFlags.Contains("NO_ACCESS_CONTROL")) Flags |= ControlFlags.SystemAclPresent;
+            else if (sddl.SAclAces.Length == 0) Flags &= ~ControlFlags.SystemAclPresent;
             else
             {
                 Flags |= parseSddlControlFlags(sddl.SAclFlags, 1);
@@ -52,11 +54,11 @@ namespace WinSdUtil.Lib.Model
             if (sd.OwnerSid.Revision == 1) Owner = new Trustee(sd.OwnerSid.ToString(), 1);
             if (sd.GroupSid.Revision == 1) Group = new Trustee(sd.GroupSid.ToString(), 1);
             Flags = (ControlFlags)sd.Control;
-            if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0)
+            if ((Flags & ControlFlags.DiscretionaryAclPresent) != 0 && sd.DACL.Aces != null)
             {
                 DAclAces = AceGen.FromBytes(sd.DACL.Aces, 0, sd.DACL.Aces.Length).Select(x => x.ToManagedAce()).ToArray();
             }
-            if ((Flags & ControlFlags.SystemAclPresent) != 0)
+            if ((Flags & ControlFlags.SystemAclPresent) != 0 && sd.SACL.Aces != null)
             {
                 SAclAces = AceGen.FromBytes(sd.SACL.Aces, 0, sd.SACL.Aces.Length).Select(x => x.ToManagedAce()).ToArray();
             }
@@ -73,9 +75,9 @@ namespace WinSdUtil.Lib.Model
             }
             else
             {
-                if (sddlControlFlags.Contains("P")) result |= ControlFlags.DiscretionaryAclProtected;
-                if (sddlControlFlags.Contains("AR")) result |= ControlFlags.DiscretionaryAclAutoInheritRequired;
-                if (sddlControlFlags.Contains("AI")) result |= ControlFlags.DiscretionaryAclAutoInherited;
+                if (sddlControlFlags.Contains("P")) result |= ControlFlags.SystemAclProtected;
+                if (sddlControlFlags.Contains("AR")) result |= ControlFlags.SystemAclAutoInheritRequired;
+                if (sddlControlFlags.Contains("AI")) result |= ControlFlags.SystemAclAutoInherited;
             }
             return result;
         }

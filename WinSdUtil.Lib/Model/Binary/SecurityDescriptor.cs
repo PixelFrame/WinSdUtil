@@ -47,8 +47,8 @@ namespace WinSdUtil.Lib.Model.Binary
             BitConverter.GetBytes(OffsetGroup).CopyTo(arr, 8);
             BitConverter.GetBytes(OffsetSacl).CopyTo(arr, 12);
             BitConverter.GetBytes(OffsetDacl).CopyTo(arr, 16);
-            if (((ControlFlags)Control & ControlFlags.SystemAclPresent) != 0) SACL.GetBytes(ref arr, (int)OffsetSacl);
-            if (((ControlFlags)Control & ControlFlags.DiscretionaryAclPresent) != 0) DACL.GetBytes(ref arr, (int)OffsetDacl);
+            if (((ControlFlags)Control & ControlFlags.SystemAclPresent) != 0 && SACL.Aces != null) SACL.GetBytes(ref arr, (int)OffsetSacl);
+            if (((ControlFlags)Control & ControlFlags.DiscretionaryAclPresent) != 0 && DACL.Aces != null) DACL.GetBytes(ref arr, (int)OffsetDacl);
             if (OffsetOwner != 0) OwnerSid.GetBytes(ref arr, (int)OffsetOwner);
             if (OffsetGroup != 0) GroupSid.GetBytes(ref arr, (int)OffsetGroup);
 

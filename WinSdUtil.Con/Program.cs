@@ -1,4 +1,5 @@
-﻿using WinSdUtil.Lib.Model;
+﻿using System.Management;
+using WinSdUtil.Lib.Model;
 
 var TestSddls = new List<string>()
 {
@@ -10,11 +11,33 @@ var TestSddls = new List<string>()
 
 foreach (var test in TestSddls)
 {
-    Console.WriteLine($"Original SDDL  : {test}");
     var sddl = new SDDL(test);
     var acl = sddl.ToACL();
     var binsd = acl.ToBinarySd();
     var acl2 = binsd.ToACL();
     var sddl2 = acl2.ToSDDL();
+    Console.WriteLine($"Original SDDL  : {test}");
     Console.WriteLine($"Converted SDDL : {sddl2}");
+    var wmibin = WmiGetBinarySd(test);
+    Console.WriteLine($"WMI Binary SD  : {BitConverter.ToString(wmibin)}");
+    Console.WriteLine($"Conv Binary SD : {BitConverter.ToString(binsd.Value)}");
+}
+
+static byte[] WmiGetBinarySd(string SDDL)
+{
+#pragma warning disable CA1416 // Validate platform compatibility
+
+    using ManagementClass Win32SdHelper = new ManagementClass("Win32_SecurityDescriptorHelper");
+
+    var inparam = Win32SdHelper.GetMethodParameters("SDDLToBinarySD");
+    inparam["SDDL"] = SDDL;
+    var outparam = Win32SdHelper.InvokeMethod("SDDLToBinarySD", inparam, null);
+    var rtValue = (uint)outparam["ReturnValue"];
+    var bin = (byte[])outparam["BinarySD"];
+    if (rtValue == 0) return bin;
+    else
+    {
+        throw new Exception($"WMI SD conversion failure: {rtValue:X}");
+    }
+#pragma warning restore CA1416 // Validate platform compatibility
 }

@@ -122,6 +122,102 @@ namespace WinSdUtil.Lib.Model
         KEY_WOW64_32KEY = 0x200
     }
 
+    [Flags]
+    public enum AccessMask_SrvsvcConfigInfo : uint
+    {
+        ReadServerInfo = 0x1,
+        ReadAdvancedServerInfo = 0x2,
+        ReadAdministrativeServerInfo = 0x4,
+        ChangeServerInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcConnection : uint
+    {
+        EnumerateConnections = 0x1,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcFile : uint
+    {
+        EnumerateOpenFiles = 0x1,
+        ForceFilesClosed = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcServerDiskEnum : uint
+    {
+        EnumerateDisks = 0x1,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcSessionInfo : uint
+    {
+        ReadSessionInfo = 0x1,
+        ReadAdministrativeSessionInfo = 0x2,
+        ChangeServerInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcShareAdminConnect : uint
+    {
+        ConnectToServer = 0x1,
+        ConnectToPausedServer = 0x2,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcShareAdminInfo : uint
+    {
+        ReadShareInfo = 0x1,
+        ReadAdministrativeShareInfo = 0x2,
+        ChangeShareInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcShareChange : uint
+    {
+        ReadShareUserInfo = 0x1,
+        ReadAdminShareUserInfo = 0x2,
+        SetShareInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcShareConnect : uint
+    {
+        ConnectToServer = 0x1,
+        ConnectToPausedServer = 0x2,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcShareFileInfo : uint
+    {
+        ReadShareInfo = 0x1,
+        ReadAdministrativeShareInfo = 0x2,
+        ChangeShareInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcSharePrintInfo : uint
+    {
+        ReadShareInfo = 0x1,
+        ReadAdministrativeShareInfo = 0x2,
+        ChangeShareInfo = 0x10,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcStatisticsInfo : uint
+    {
+        ReadStatistics = 0x1,
+    }
+
+    [Flags]
+    public enum AccessMask_SrvsvcTransportEnum : uint
+    {
+        Enumerate = 0x1,
+        AdvancedEnumerate = 0x2,
+        SetInfo = 0x10,
+    }
+
     public enum AccessMaskType
     {
         File,
@@ -130,7 +226,21 @@ namespace WinSdUtil.Lib.Model
         Process,
         Service,
         ServiceControlManager,
-        Registry
+        Registry,
+        SrvsvcConfigInfo,
+        SrvsvcConnection,
+        SrvsvcFile,
+        SrvsvcServerDiskEnum,
+        SrvsvcSessionInfo,
+        SrvsvcShareAdminConnect,
+        SrvsvcShareAdminInfo,
+        SrvsvcShareChange,
+        SrvsvcShareConnect,
+        SrvsvcShareFileInfo,
+        SrvsvcSharePrintInfo,
+        SrvsvcStatisticsInfo,
+        SrvsvcTransportEnum,
+        Unknown,
     }
 
     public class AccessMask

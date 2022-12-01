@@ -26,8 +26,10 @@ namespace WinSdUtil.Lib.Model.Binary
             OffsetGroup = BitConverter.ToUInt32(blob, 8);
             OffsetSacl = BitConverter.ToUInt32(blob, 12);
             OffsetDacl = BitConverter.ToUInt32(blob, 16);
-            SACL = new ACL(blob, (int)OffsetSacl);
-            DACL = new ACL(blob, (int)OffsetDacl);
+            if (OffsetSacl != 0) SACL = new ACL(blob, (int)OffsetSacl);
+            else SACL = new ACL();
+            if (OffsetDacl != 0) DACL = new ACL(blob, (int)OffsetDacl);
+            else DACL = new ACL();
             OwnerSid = new SID(blob, (int)OffsetOwner);
             GroupSid = new SID(blob, (int)OffsetGroup);
         }

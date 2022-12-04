@@ -7,26 +7,30 @@ namespace WinSdUtil.Lib.Model
     public class Trustee
     {
         internal static string RegexPatternSid = @"S-(?<Revision>\d+)-(?<IdentifierAuthority>\d+)(-(?<SubAuthority>\d+))+";
+
+        internal static ITrusteeDataProvider? DataProvider;
+
         public string Sid { get; private set; } = "S-1-0-0";
         public string Name { get; private set; } = "NULL";
         public string DisplayName { get; private set; } = "NULL";
         public string SddlName { get; private set; } = "S-1-0-0";
-        public string Description { get; private set; } = "";
+        public string Description { get; private set; } = "NO TRUSTEE DATA SOURCE AVAILABLE";
         public bool IsLocal { get; private set; } = true;
         public string? DomainId { get; private set; } = null;
 
         public Trustee() { }
         public Trustee(string SddlTrusteeOrSid, int Type)
         {
-            using var context = new LibDbContext();
+            if (DataProvider == null) return;
+            var dataSource = DataProvider.Data;
             Trustee? dbResult = null;
-            if (Type == 0) dbResult = context.Trustees.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
-            else dbResult = context.Trustees.FirstOrDefault(t => t.Sid == SddlTrusteeOrSid);
+            if (Type == 0) dbResult = dataSource.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
+            else dbResult = dataSource.FirstOrDefault(t => t.Sid == SddlTrusteeOrSid);
             if (dbResult == null)
             {
                 if (SddlTrusteeOrSid.StartsWith("S-1-5-5"))
                 {
-                    dbResult = context.Trustees.Single(t => t.SddlName == "S-1-5-5-x-y");
+                    dbResult = dataSource.Single(t => t.SddlName == "S-1-5-5-x-y");
                     dbResult.Sid = SddlTrusteeOrSid;
                     dbResult.SddlName = SddlTrusteeOrSid;
                 }

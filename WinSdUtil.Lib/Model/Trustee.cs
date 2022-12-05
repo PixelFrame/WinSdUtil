@@ -1,5 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using WinSdUtil.Lib.Data;
+using WinSdUtil.Lib.Helper;
 using WinSdUtil.Lib.Model.Binary;
 
 namespace WinSdUtil.Lib.Model
@@ -10,13 +12,14 @@ namespace WinSdUtil.Lib.Model
 
         public static ITrusteeDataProvider? DataProvider;
 
-        public string Sid { get; private set; } = "S-1-0-0";
-        public string Name { get; private set; } = "NULL";
-        public string DisplayName { get; private set; } = "NULL";
-        public string SddlName { get; private set; } = "S-1-0-0";
-        public string Description { get; private set; } = "NO TRUSTEE DATA SOURCE AVAILABLE";
-        public bool IsLocal { get; private set; } = true;
-        public string? DomainId { get; private set; } = null;
+        public string Sid { get; set; } = "S-1-0-0";
+        public string Name { get; set; } = "NULL";
+        public string DisplayName { get; set; } = "NULL";
+        public string SddlName { get; set; } = "S-1-0-0";
+        public string Description { get; set; } = "NO TRUSTEE DATA SOURCE AVAILABLE";
+        [JsonConverter(typeof(JsonBoolConverter))]
+        public bool IsLocal { get; set; } = true;
+        public string? DomainId { get; set; } = null;
 
         public Trustee() { }
         public Trustee(string SddlTrusteeOrSid, int Type)

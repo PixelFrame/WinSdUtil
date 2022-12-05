@@ -8,7 +8,7 @@ namespace WinSdUtil.Lib.Model
     {
         internal static string RegexPatternSid = @"S-(?<Revision>\d+)-(?<IdentifierAuthority>\d+)(-(?<SubAuthority>\d+))+";
 
-        internal static ITrusteeDataProvider? DataProvider;
+        public static ITrusteeDataProvider? DataProvider;
 
         public string Sid { get; private set; } = "S-1-0-0";
         public string Name { get; private set; } = "NULL";
@@ -22,7 +22,7 @@ namespace WinSdUtil.Lib.Model
         public Trustee(string SddlTrusteeOrSid, int Type)
         {
             if (DataProvider == null) return;
-            var dataSource = DataProvider.Data;
+            var dataSource = DataProvider.TrusteeData;
             Trustee? dbResult = null;
             if (Type == 0) dbResult = dataSource.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
             else dbResult = dataSource.FirstOrDefault(t => t.Sid == SddlTrusteeOrSid);

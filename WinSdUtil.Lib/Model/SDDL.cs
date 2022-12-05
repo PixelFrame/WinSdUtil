@@ -5,7 +5,8 @@ namespace WinSdUtil.Lib.Model
 {
     public class SDDL
     {
-        public static readonly string RegexPatternSddl = @"(O:(?<Owner>..))?(G:(?<Group>..))?(D:(?<DACL>(?<DAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<DAclAces>\([^\(\)]*\))*))?(S:(?<SACL>(?<SAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<SAclAces>\([^\(\)]*\))*))?";
+        internal static readonly string RegexPatternSddl = @"(O:(?<Owner>..))?(G:(?<Group>..))?(D:(?<DACL>(?<DAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<DAclAces>\([^\(\)]*\))*))?(S:(?<SACL>(?<SAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<SAclAces>\([^\(\)]*\))*))?";
+        
         public string Value
         {
             get
@@ -77,7 +78,7 @@ namespace WinSdUtil.Lib.Model
                 DAclAces = new string[acl.DAclAces.Length];
                 for (int i = 0; i < acl.DAclAces.Length; ++i)
                 {
-                    DAclAces[i] = acl.DAclAces[i].GetSDDL();
+                    DAclAces[i] = acl.DAclAces[i].ToSDDL();
                 }
             }
             else if ((acl.Flags & ControlFlags.DiscretionaryAclPresent) != 0)
@@ -90,7 +91,7 @@ namespace WinSdUtil.Lib.Model
                 SAclAces = new string[acl.SAclAces.Length];
                 for (int i = 0; i < acl.SAclAces.Length; ++i)
                 {
-                    SAclAces[i] = acl.SAclAces[i].GetSDDL();
+                    SAclAces[i] = acl.SAclAces[i].ToSDDL();
                 }
             }
             else if ((acl.Flags & ControlFlags.SystemAclPresent) != 0)

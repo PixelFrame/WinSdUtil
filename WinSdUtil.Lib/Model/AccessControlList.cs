@@ -1,4 +1,5 @@
-﻿using WinSdUtil.Lib.Model.Binary;
+﻿using System.Text;
+using WinSdUtil.Lib.Model.Binary;
 
 namespace WinSdUtil.Lib.Model
 {
@@ -155,6 +156,31 @@ namespace WinSdUtil.Lib.Model
             }
 
             return sd;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            if (Owner != null) sb.AppendLine($"Owner: {Owner.DisplayName} ({Owner.SddlName})");
+            if (Group != null) sb.AppendLine($"Owner: {Group.DisplayName} ({Group.SddlName})");
+            sb.AppendLine($"ControlFlags: {Flags} (0x{((ushort)Flags).ToString("X")})");
+            if (DAclAces != null)
+            {
+                sb.AppendLine("DACL:");
+                foreach(var ace in DAclAces )
+                {
+                    sb.AppendLine(ace.ToString("  "));
+                }
+            }
+            if (SAclAces != null)
+            {
+                sb.AppendLine("SACL:");
+                foreach (var ace in SAclAces)
+                {
+                    sb.AppendLine(ace.ToString("  "));
+                }
+            }
+            return sb.ToString();
         }
     }
 }

@@ -2,9 +2,15 @@
 
 namespace WinSdUtil.Lib.Data
 {
-    internal class LibDbDataProvider : ITrusteeDataProvider
+    public class LibDbDataProvider : ITrusteeDataProvider, IAdSchemaGuidProvider, IDisposable
     {
         private readonly LibDbContext dbContext = new();
-        public IEnumerable<Trustee> Data { get => dbContext.Trustees; }
+        public IEnumerable<Trustee> TrusteeData { get => dbContext.Trustees; }
+        public IEnumerable<AdSchemaGuid> AdSchemaGuidData { get => dbContext.AdSchemaGuids; }
+
+        public void Dispose()
+        {
+            ((IDisposable)dbContext).Dispose();
+        }
     }
 }

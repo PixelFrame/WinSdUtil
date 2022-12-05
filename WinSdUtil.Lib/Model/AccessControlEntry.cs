@@ -13,7 +13,15 @@ namespace WinSdUtil.Lib.Model
         public AceFlags Flags { get; set; } = 0;
         public AccessMask Mask { get; set; } = new();
         public Guid ObjectGuid { get; set; }
+        public AdSchemaGuid AdSchemaObjectGuid
+        {
+            get => new AdSchemaGuid(ObjectGuid.ToString());
+        }
         public Guid InheritObjectGuid { get; set; }
+        public AdSchemaGuid AdSchemaInheritObjectGuid
+        {
+            get => new AdSchemaGuid(InheritObjectGuid.ToString());
+        }
         public Trustee Trustee { get; set; } = new();
         public byte[] ApplicationData { get; set; } = Array.Empty<byte>();
 
@@ -62,7 +70,7 @@ namespace WinSdUtil.Lib.Model
             if (regexMatchAce.Groups["InheritObjectGuid"].Value != string.Empty) InheritObjectGuid = new Guid(regexMatchAce.Groups["InheritObjectGuid"].Value);
         }
 
-        public string GetSDDL()
+        public string ToSDDL()
         {
             var sb = new StringBuilder();
             sb.Append('(');
@@ -175,6 +183,38 @@ namespace WinSdUtil.Lib.Model
                 default:
                     throw new NotImplementedException($"The specified ACE type ({Type}) is not supported to be converted to binary.");
             }
+        }
+
+        public override string ToString() => ToString("");
+        public string ToString(string Indent = "")
+        {
+            var sb = new StringBuilder();
+            sb.Append(Indent);
+            sb.Append(Type);
+            sb.Append('|');
+            sb.Append(Flags);
+            sb.Append("(0x");
+            sb.Append(((byte)Flags).ToString("X"));
+            sb.Append(")|");
+            if(ObjectGuid!= Guid.Empty)
+            {
+                sb.Append("Object: ");
+                sb.Append(AdSchemaObjectGuid.Name);
+                sb.Append('(');
+                sb.Append(AdSchemaObjectGuid.SchemaIdGuid);
+                sb.Append(")|");
+            }
+            if (InheritObjectGuid != Guid.Empty)
+            {
+                sb.Append("InheritedObject: ");
+                sb.Append(AdSchemaInheritObjectGuid.Name);
+                sb.Append('(');
+                sb.Append(AdSchemaInheritObjectGuid.SchemaIdGuid);
+                sb.Append(")|");
+            }
+            sb.Append($"{Trustee.DisplayName} ({Trustee.SddlName})");
+
+            return sb.ToString();
         }
     }
 }

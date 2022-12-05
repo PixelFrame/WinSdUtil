@@ -2,8 +2,8 @@
 
 namespace WinSdUtil.Lib.Data
 {
-    internal interface ITrusteeDataProvider
+    public interface ITrusteeDataProvider
     {
-        IEnumerable<Trustee> Data { get; }
+        IEnumerable<Trustee> TrusteeData { get; }
     }
 }

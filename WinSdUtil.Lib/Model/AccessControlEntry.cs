@@ -196,7 +196,7 @@ namespace WinSdUtil.Lib.Model
             sb.Append("(0x");
             sb.Append(((byte)Flags).ToString("X"));
             sb.Append(")|");
-            if(ObjectGuid!= Guid.Empty)
+            if (ObjectGuid != Guid.Empty)
             {
                 sb.Append("Object: ");
                 sb.Append(AdSchemaObjectGuid.Name);

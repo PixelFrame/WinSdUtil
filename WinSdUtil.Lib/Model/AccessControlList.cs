@@ -167,7 +167,7 @@ namespace WinSdUtil.Lib.Model
             if (DAclAces != null)
             {
                 sb.AppendLine("DACL:");
-                foreach(var ace in DAclAces )
+                foreach (var ace in DAclAces)
                 {
                     sb.AppendLine(ace.ToString("  "));
                 }

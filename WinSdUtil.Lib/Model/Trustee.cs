@@ -91,7 +91,7 @@ namespace WinSdUtil.Lib.Model
         internal SID ToBinarySid()
         {
             var sidstr = Sid;
-            if(Sid.StartsWith("S-1-5-21"))
+            if (Sid.StartsWith("S-1-5-21"))
             {
                 sidstr = sidstr.Replace("<domain>", "0-0-0");
                 sidstr = sidstr.Replace("<root domain>", "0-0-0");

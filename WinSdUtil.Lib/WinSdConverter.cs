@@ -15,7 +15,7 @@ namespace WinSdUtil.Lib
 
         public WinSdConverter(bool UseJsonDataProvider, string ConnString)
         {
-            if (UseJsonDataProvider) 
+            if (UseJsonDataProvider)
             {
                 var trusteeJsonData = File.ReadAllText("Data/WinSdTrustee.json");
                 var adSchemaGuidJsonData = File.ReadAllText("Data/WinSdAdSchemaGuid.json");

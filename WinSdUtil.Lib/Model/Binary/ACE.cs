@@ -40,7 +40,7 @@ namespace WinSdUtil.Lib.Model.Binary
             BitConverter.GetBytes(Mask).CopyTo(arr, 4);
             BitConverter.GetBytes(Flags).CopyTo(arr, 8);
             var offset = 12;
-            if(ObjectType != null)
+            if (ObjectType != null)
             {
                 Buffer.BlockCopy(ObjectType.Value.ToByteArray(), 0, arr, offset, 16);
                 offset += 16;

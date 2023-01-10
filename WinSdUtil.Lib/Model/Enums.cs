@@ -42,8 +42,8 @@ namespace WinSdUtil.Lib
         SystemAuditCallback = 13,
         SystemAlarmCallback = 14,
         SystemAuditCallbackObject = 15,
-        MaxDefinedAceType = 16,
-        SystemAlarmCallbackObject = 16
+        SystemAlarmCallbackObject = 16,
+        MaxDefinedAceType = 16
     }
 
     [Flags]

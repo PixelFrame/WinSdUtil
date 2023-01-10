@@ -40,7 +40,11 @@ namespace WinSdUtil.Lib.Model
                 else if (SddlTrusteeOrSid.StartsWith("S-1-5-21"))
                 {
                     var domainSidMatch = Regex.Match(SddlTrusteeOrSid, @"S-1-5-21-(?<DomainId>.*-.*-.*)-(?<RID>.*)");
-                    dbResult = new Trustee()
+                    var RID = domainSidMatch.Groups["RID"].Value;
+                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<machine>-{RID}");
+                    if (dbResult == null) dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<root domain>-{RID}");
+                    if (dbResult == null) dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<domain>-{RID}");
+                    if (dbResult == null) dbResult = new Trustee()
                     {
                         Sid = SddlTrusteeOrSid,
                         Name = "DOMAIN_ACCOUNT",
@@ -86,8 +90,15 @@ namespace WinSdUtil.Lib.Model
 
         internal SID ToBinarySid()
         {
+            var sidstr = Sid;
+            if(Sid.StartsWith("S-1-5-21"))
+            {
+                sidstr = sidstr.Replace("<domain>", "0-0-0");
+                sidstr = sidstr.Replace("<root domain>", "0-0-0");
+                sidstr = sidstr.Replace("<machine>", "0-0-0");
+            }
             var sid = new SID();
-            var regexMatch = Regex.Match(Sid, RegexPatternSid);
+            var regexMatch = Regex.Match(sidstr, RegexPatternSid);
             sid.Revision = byte.Parse(regexMatch.Groups["Revision"].Value);
             sid.IdentifierAuthority = new(ulong.Parse(regexMatch.Groups["IdentifierAuthority"].Value));
             sid.SubAuthorityCount = (byte)regexMatch.Groups["SubAuthority"].Captures.Count;

@@ -13,7 +13,7 @@ namespace WinSdUtil.Lib
             initLibDbDataProvider();
         }
 
-        public WinSdConverter(bool UseJsonDataProvider)
+        public WinSdConverter(bool UseJsonDataProvider, string ConnString)
         {
             if (UseJsonDataProvider) 
             {
@@ -25,7 +25,7 @@ namespace WinSdUtil.Lib
             }
             else
             {
-                initLibDbDataProvider();
+                initLibDbDataProvider(ConnString);
             }
         }
 
@@ -46,6 +46,13 @@ namespace WinSdUtil.Lib
         private void initLibDbDataProvider()
         {
             if (libDbDataProvider == null) { libDbDataProvider = new LibDbDataProvider(); }
+            Trustee.DataProvider = libDbDataProvider;
+            AdSchemaGuid.DataProvider = libDbDataProvider;
+        }
+
+        private void initLibDbDataProvider(string ConnString)
+        {
+            if (libDbDataProvider == null) { libDbDataProvider = new LibDbDataProvider(ConnString); }
             Trustee.DataProvider = libDbDataProvider;
             AdSchemaGuid.DataProvider = libDbDataProvider;
         }

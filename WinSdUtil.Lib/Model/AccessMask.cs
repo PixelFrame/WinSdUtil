@@ -225,7 +225,7 @@ namespace WinSdUtil.Lib.Model
         ActiveDirectory,
         Process,
         Service,
-        ServiceControlManager,
+        SCM,
         Registry,
         SrvsvcConfigInfo,
         SrvsvcConnection,
@@ -301,7 +301,7 @@ namespace WinSdUtil.Lib.Model
                         if ((svcMask & __) != 0) list.Add(__.ToString());
                     }
                     break;
-                case AccessMaskType.ServiceControlManager:
+                case AccessMaskType.SCM:
                     var scmMask = (AccessMask_SCM)ObjectSpecific;
                     foreach (AccessMask_SCM __ in Enum.GetValues(typeof(AccessMask_SCM)))
                     {

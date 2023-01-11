@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using WinSdUtil.Lib.Data;
 using WinSdUtil.Lib.Helper;
@@ -42,9 +43,9 @@ namespace WinSdUtil.Lib.Model
                     var domainSidMatch = Regex.Match(SddlTrusteeOrSid, @"S-1-5-21-(?<DomainId>.*-.*-.*)-(?<RID>.*)");
                     var RID = domainSidMatch.Groups["RID"].Value;
                     dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<machine>-{RID}");
-                    if (dbResult == null) dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<root domain>-{RID}");
-                    if (dbResult == null) dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<domain>-{RID}");
-                    if (dbResult == null) dbResult = new Trustee()
+                    dbResult ??= dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<root domain>-{RID}");
+                    dbResult ??= dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<domain>-{RID}");
+                    dbResult ??= new Trustee()
                     {
                         Sid = SddlTrusteeOrSid,
                         Name = "DOMAIN_ACCOUNT",
@@ -54,6 +55,20 @@ namespace WinSdUtil.Lib.Model
                         IsLocal = false,
                         DomainId = domainSidMatch.Groups["DomainId"].Value
                     };
+                }
+                else if (SddlTrusteeOrSid.StartsWith("S-1-5-80"))
+                {
+                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-80-<SERVICE>");
+                    dbResult ??= new Trustee()
+                    {
+                        Name = "NT_SERVICE",
+                        DisplayName = "NT Service",
+                        Description = "An NT Service account.",
+                        IsLocal = false,
+                        DomainId = null
+                    };
+                    dbResult.Sid = SddlTrusteeOrSid;
+                    dbResult.SddlName = SddlTrusteeOrSid;
                 }
                 else
                 {

@@ -30,8 +30,10 @@ namespace WinSdUtil.Lib.Model.Binary
             else SACL = new ACL();
             if (OffsetDacl != 0) DACL = new ACL(blob, (int)OffsetDacl);
             else DACL = new ACL();
-            OwnerSid = new SID(blob, (int)OffsetOwner);
-            GroupSid = new SID(blob, (int)OffsetGroup);
+            if (OffsetOwner != 0) OwnerSid = new SID(blob, (int)OffsetOwner);
+            else OwnerSid = new();
+            if (OffsetGroup != 0)GroupSid = new SID(blob, (int)OffsetGroup);
+            else GroupSid = new();
         }
 
         internal byte[] GetBytes()

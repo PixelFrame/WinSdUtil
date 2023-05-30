@@ -5,7 +5,7 @@ namespace WinSdUtil.Lib.Model
 {
     public class SDDL
     {
-        internal static readonly string RegexPatternSddl = @"(O:(?<Owner>..))?(G:(?<Group>..))?(D:(?<DACL>(?<DAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<DAclAces>\([^\(\)]*\))*))?(S:(?<SACL>(?<SAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<SAclAces>\([^\(\)]*\))*))?";
+        internal static readonly string RegexPatternSddl = @"(O:(?<Owner>S-1-[^G]*|..))?(G:(?<Group>S-1-[^D]*|..))?(D:(?<DACL>(?<DAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<DAclAces>\([^\(\)]*\))*))?(S:(?<SACL>(?<SAclFlags>(P|AI|AR|NO_ACCESS_CONTROL){0,3})(?<SAclAces>\([^\(\)]*\))*))?";
 
         public string Value
         {

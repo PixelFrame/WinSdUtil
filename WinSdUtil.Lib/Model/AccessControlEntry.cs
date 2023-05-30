@@ -7,7 +7,7 @@ namespace WinSdUtil.Lib.Model
 {
     public class AccessControlEntry
     {
-        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>[0-9A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(?<ResourceAttribute>\([^\(\)]\))?\)";
+        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>0x[0-9a-fA-F]*|[0-9A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(?<ResourceAttribute>\([^\(\)]\))?\)";
 
         public AceType Type { get; set; } = 0;
         public AceFlags Flags { get; set; } = 0;
@@ -48,7 +48,11 @@ namespace WinSdUtil.Lib.Model
 
             Mask.Full = 0;
             var sddlRights = regexMatchAce.Groups["Rights"].Value;
-            if (Regex.IsMatch(sddlRights, @"\d+"))
+            if (Regex.IsMatch(sddlRights, @"0x[0-9a-fA-F]"))
+            {
+                Mask.Full = Convert.ToUInt32(sddlRights, 16);
+            }
+            else if (Regex.IsMatch(sddlRights, @"\d+"))
             {
                 if (!uint.TryParse(sddlRights, out uint accessMask))
                 { throw new ArgumentException($"Invalid ACE Right: {sddlRights}"); }
@@ -59,8 +63,16 @@ namespace WinSdUtil.Lib.Model
                 var sddlRightsList = sddlRights.SplitInParts(2);
                 foreach (var sddlRight in sddlRightsList)
                 {
-                    if (!SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out uint accessBit)) { throw new ArgumentException($"Invalid ACE Right: {sddlRight}"); }
-                    Mask.Full |= accessBit;
+                    uint accessBit;
+                    if (SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out accessBit)
+                        || SddlMapping.FileAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
+                        || SddlMapping.RegistryAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
+                        ) { Mask.Full |= accessBit; }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid ACE Right: {sddlRight}");
+                    }
+
                 }
             }
 

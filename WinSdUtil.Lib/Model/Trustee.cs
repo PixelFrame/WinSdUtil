@@ -47,14 +47,14 @@ namespace WinSdUtil.Lib.Model
                     dbResult ??= dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<domain>-{RID}");
                     dbResult ??= new Trustee()
                     {
-                        Sid = SddlTrusteeOrSid,
                         Name = "DOMAIN_ACCOUNT",
                         DisplayName = "Unknown (Domain Account)",
-                        SddlName = SddlTrusteeOrSid,
                         Description = "An account from Active Directory or local computer.",
                         IsLocal = false,
                         DomainId = domainSidMatch.Groups["DomainId"].Value
                     };
+                    dbResult.Sid = SddlTrusteeOrSid;
+                    dbResult.SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-5-80"))
                 {

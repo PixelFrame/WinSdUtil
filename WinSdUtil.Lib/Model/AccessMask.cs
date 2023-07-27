@@ -218,6 +218,27 @@ namespace WinSdUtil.Lib.Model
         SetInfo = 0x10,
     }
 
+    [Flags]
+    public enum AccessMask_Unknown : uint
+    {
+        BIT0001 = 0x1,
+        BIT0002 = 0x2,
+        BIT0004 = 0x4,
+        BIT0008 = 0x8,
+        BIT0010 = 0x10,
+        BIT0020 = 0x20,
+        BIT0040 = 0x40,
+        BIT0080 = 0x80,
+        BIT0100 = 0x100,
+        BIT0200 = 0x200,
+        BIT0400 = 0x400,
+        BIT0800 = 0x800,
+        BIT1000 = 0x1000,
+        BIT2000 = 0x2000,
+        BIT4000 = 0x4000,
+        BIT8000 = 0x8000,
+    }
+
     public enum AccessMaskType
     {
         File,

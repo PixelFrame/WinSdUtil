@@ -70,6 +70,48 @@ namespace WinSdUtil.Lib.Model
                     dbResult.Sid = SddlTrusteeOrSid;
                     dbResult.SddlName = SddlTrusteeOrSid;
                 }
+                else if (SddlTrusteeOrSid.StartsWith("S-1-15-2"))
+                {
+                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-2-<AppNameHash>");
+                    dbResult ??= new Trustee()
+                    {
+                        Name = "APP_PACKAGE",
+                        DisplayName = "Application Package",
+                        Description = "An application running in an app package context.",
+                        IsLocal = true,
+                        DomainId = null
+                    };
+                    dbResult.Sid = SddlTrusteeOrSid;
+                    dbResult.SddlName = SddlTrusteeOrSid;
+                }
+                else if (SddlTrusteeOrSid.StartsWith("S-1-15-3-1024"))
+                {
+                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-3-1024-<AppCapNameHash>");
+                    dbResult ??= new Trustee()
+                    {
+                        Name = "APP_CAPABILITY_APP_CAPABILITY",
+                        DisplayName = "App Capability: app capability",
+                        Description = "App Capability: app capability",
+                        IsLocal = true,
+                        DomainId = null
+                    };
+                    dbResult.Sid = SddlTrusteeOrSid;
+                    dbResult.SddlName = SddlTrusteeOrSid;
+                }
+                else if (SddlTrusteeOrSid.StartsWith("S-1-15-3"))
+                {
+                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-3-<GUID>");
+                    dbResult ??= new Trustee()
+                    {
+                        Name = "APP_CAPABILITY_DEVICE_CAPABILITY",
+                        DisplayName = "App Capability: device capability",
+                        Description = "App Capability: device capability.",
+                        IsLocal = true,
+                        DomainId = null
+                    };
+                    dbResult.Sid = SddlTrusteeOrSid;
+                    dbResult.SddlName = SddlTrusteeOrSid;
+                }
                 else
                 {
                     dbResult = new Trustee()

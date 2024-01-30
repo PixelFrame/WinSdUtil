@@ -23,6 +23,11 @@ namespace WinSdUtil.Lib.Model.Binary
                     case AceType.AccessDenied:
                     case AceType.SystemAudit:
                     case AceType.SystemAlarm:
+                    case AceType.SystemMandatoryLabel:
+                    case AceType.SystemResourceAttribute:
+                    case AceType.SystemScopedPolicy:
+                    case AceType.SystemProcessTrustLabel:
+                    case AceType.SystemAccessFilter:
                         newAce.Mask = BitConverter.ToUInt32(bytes, offset + 4);
                         newAce.Sid = new SID(bytes, offset + 8);
                         offset += newAce.Header.AceSize;
@@ -87,7 +92,7 @@ namespace WinSdUtil.Lib.Model.Binary
                         offset += newAce.Header.AceSize;
                         break;
                     default:
-                        throw new NotImplementedException($"The specified ACE type ({(AceType)newAce.Header.AceType}) is not supported to be converted to binary.");
+                        throw new NotImplementedException($"The specified ACE type ({(AceType)newAce.Header.AceType}) is not supported to be converted from binary.");
                 }
                 result.Add(newAce);
             }

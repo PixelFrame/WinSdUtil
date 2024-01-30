@@ -65,6 +65,15 @@
             ["AL"] = AceType.SystemAlarm,
             ["OU"] = AceType.SystemAuditObject,
             ["OL"] = AceType.SystemAlarmObject,
+            ["ML"] = AceType.SystemMandatoryLabel,
+            ["XA"] = AceType.AccessAllowedCallback,
+            ["XD"] = AceType.AccessDeniedCallback,
+            ["RA"] = AceType.SystemResourceAttribute,
+            ["SP"] = AceType.SystemScopedPolicy,
+            ["XU"] = AceType.SystemAuditCallback,
+            ["ZA"] = AceType.AccessAllowedCallbackObject,
+            ["TL"] = AceType.SystemProcessTrustLabel,
+            ["FL"] = AceType.SystemAccessFilter,
         };
 
         internal static readonly BidirectionalDictionary<string, AceFlags> AceFlagsMapping = new()

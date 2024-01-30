@@ -43,7 +43,13 @@ namespace WinSdUtil.Lib
         SystemAlarmCallback = 14,
         SystemAuditCallbackObject = 15,
         SystemAlarmCallbackObject = 16,
-        MaxDefinedAceType = 16
+
+        // ACE types after vista
+        SystemMandatoryLabel = 17,
+        SystemResourceAttribute = 18,
+        SystemScopedPolicy = 19,
+        SystemProcessTrustLabel = 20,
+        SystemAccessFilter = 21,
     }
 
     [Flags]

@@ -288,14 +288,14 @@ namespace WinSdUtil.Lib.Model
             switch (ObjectType)
             {
                 case AccessMaskType.File:
-                    var fileMask = (AccessMask_File)ObjectSpecific;
+                    var fileMask = (AccessMask_File)Full;                                                       // As FILE_ALL_ACCESS overlaps generic flag, we need to use Full here. Same to Directory, Process, Service, SCM, Registry.
                     foreach (AccessMask_File __ in Enum.GetValues(typeof(AccessMask_File)))
                     {
                         if ((fileMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Directory:
-                    var dirMask = (AccessMask_Directory)ObjectSpecific;
+                    var dirMask = (AccessMask_Directory)Full;
                     foreach (AccessMask_Directory __ in Enum.GetValues(typeof(AccessMask_Directory)))
                     {
                         if ((dirMask & __) == __) list.Add(__.ToString());
@@ -309,28 +309,28 @@ namespace WinSdUtil.Lib.Model
                     }
                     break;
                 case AccessMaskType.Process:
-                    var procMask = (AccessMask_Process)ObjectSpecific;
+                    var procMask = (AccessMask_Process)Full;
                     foreach (AccessMask_Process __ in Enum.GetValues(typeof(AccessMask_Process)))
                     {
                         if ((procMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Service:
-                    var svcMask = (AccessMask_Service)ObjectSpecific;
+                    var svcMask = (AccessMask_Service)Full;
                     foreach (AccessMask_Service __ in Enum.GetValues(typeof(AccessMask_Service)))
                     {
                         if ((svcMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SCM:
-                    var scmMask = (AccessMask_SCM)ObjectSpecific;
+                    var scmMask = (AccessMask_SCM)Full;
                     foreach (AccessMask_SCM __ in Enum.GetValues(typeof(AccessMask_SCM)))
                     {
                         if ((scmMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Registry:
-                    var regMask = (AccessMask_Registry)ObjectSpecific;
+                    var regMask = (AccessMask_Registry)Full;
                     foreach (AccessMask_Registry __ in Enum.GetValues(typeof(AccessMask_Registry)))
                     {
                         if ((regMask & __) == __) list.Add(__.ToString());

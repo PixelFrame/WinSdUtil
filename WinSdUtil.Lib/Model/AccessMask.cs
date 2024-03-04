@@ -282,7 +282,7 @@ namespace WinSdUtil.Lib.Model
             var stdMask = (AccessMask_Standard)Standard;
             foreach (AccessMask_Standard __ in Enum.GetValues(typeof(AccessMask_Standard)))
             {
-                if ((stdMask & __) != 0) list.Add(__.ToString());
+                if ((stdMask & __) == __) list.Add(__.ToString());
             }
 
             switch (ObjectType)
@@ -291,140 +291,140 @@ namespace WinSdUtil.Lib.Model
                     var fileMask = (AccessMask_File)ObjectSpecific;
                     foreach (AccessMask_File __ in Enum.GetValues(typeof(AccessMask_File)))
                     {
-                        if ((fileMask & __) != 0) list.Add(__.ToString());
+                        if ((fileMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Directory:
                     var dirMask = (AccessMask_Directory)ObjectSpecific;
                     foreach (AccessMask_Directory __ in Enum.GetValues(typeof(AccessMask_Directory)))
                     {
-                        if ((dirMask & __) != 0) list.Add(__.ToString());
+                        if ((dirMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.ActiveDirectory:
                     var adMask = (AccessMask_ActiveDirectory)ObjectSpecific;
                     foreach (AccessMask_ActiveDirectory __ in Enum.GetValues(typeof(AccessMask_ActiveDirectory)))
                     {
-                        if ((adMask & __) != 0) list.Add(__.ToString());
+                        if ((adMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Process:
                     var procMask = (AccessMask_Process)ObjectSpecific;
                     foreach (AccessMask_Process __ in Enum.GetValues(typeof(AccessMask_Process)))
                     {
-                        if ((procMask & __) != 0) list.Add(__.ToString());
+                        if ((procMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Service:
                     var svcMask = (AccessMask_Service)ObjectSpecific;
                     foreach (AccessMask_Service __ in Enum.GetValues(typeof(AccessMask_Service)))
                     {
-                        if ((svcMask & __) != 0) list.Add(__.ToString());
+                        if ((svcMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SCM:
                     var scmMask = (AccessMask_SCM)ObjectSpecific;
                     foreach (AccessMask_SCM __ in Enum.GetValues(typeof(AccessMask_SCM)))
                     {
-                        if ((scmMask & __) != 0) list.Add(__.ToString());
+                        if ((scmMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.Registry:
                     var regMask = (AccessMask_Registry)ObjectSpecific;
                     foreach (AccessMask_Registry __ in Enum.GetValues(typeof(AccessMask_Registry)))
                     {
-                        if ((regMask & __) != 0) list.Add(__.ToString());
+                        if ((regMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcConfigInfo:
                     var srvsvcConfigInfoMask = (AccessMask_SrvsvcConfigInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcConfigInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcConfigInfo)))
                     {
-                        if ((srvsvcConfigInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcConfigInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcConnection:
                     var srvsvcConnMask = (AccessMask_SrvsvcConnection)ObjectSpecific;
                     foreach (AccessMask_SrvsvcConnection __ in Enum.GetValues(typeof(AccessMask_SrvsvcConnection)))
                     {
-                        if ((srvsvcConnMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcConnMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcFile:
                     var srvsvcFileMask = (AccessMask_SrvsvcFile)ObjectSpecific;
                     foreach (AccessMask_SrvsvcFile __ in Enum.GetValues(typeof(AccessMask_SrvsvcFile)))
                     {
-                        if ((srvsvcFileMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcFileMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcServerDiskEnum:
                     var srvsvcServerDiskEnumMask = (AccessMask_SrvsvcServerDiskEnum)ObjectSpecific;
                     foreach (AccessMask_SrvsvcServerDiskEnum __ in Enum.GetValues(typeof(AccessMask_SrvsvcServerDiskEnum)))
                     {
-                        if ((srvsvcServerDiskEnumMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcServerDiskEnumMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcSessionInfo:
                     var srvsvcSessionInfoMask = (AccessMask_SrvsvcSessionInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcSessionInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcSessionInfo)))
                     {
-                        if ((srvsvcSessionInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcSessionInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcShareAdminConnect:
                     var srvsvcShareAdminConnectMask = (AccessMask_SrvsvcShareAdminConnect)ObjectSpecific;
                     foreach (AccessMask_SrvsvcShareAdminConnect __ in Enum.GetValues(typeof(AccessMask_SrvsvcShareAdminConnect)))
                     {
-                        if ((srvsvcShareAdminConnectMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcShareAdminConnectMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcShareAdminInfo:
                     var srvsvcShareAdminInfoMask = (AccessMask_SrvsvcShareAdminInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcShareAdminInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcShareAdminInfo)))
                     {
-                        if ((srvsvcShareAdminInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcShareAdminInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcShareChange:
                     var srvsvcShareChangeMask = (AccessMask_SrvsvcShareChange)ObjectSpecific;
                     foreach (AccessMask_SrvsvcShareChange __ in Enum.GetValues(typeof(AccessMask_SrvsvcShareChange)))
                     {
-                        if ((srvsvcShareChangeMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcShareChangeMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcShareConnect:
                     var srvsvcShareConnectMask = (AccessMask_SrvsvcShareConnect)ObjectSpecific;
                     foreach (AccessMask_SrvsvcShareConnect __ in Enum.GetValues(typeof(AccessMask_SrvsvcShareConnect)))
                     {
-                        if ((srvsvcShareConnectMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcShareConnectMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcShareFileInfo:
                     var srvsvcShareFileInfoMask = (AccessMask_SrvsvcShareFileInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcShareFileInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcShareFileInfo)))
                     {
-                        if ((srvsvcShareFileInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcShareFileInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcSharePrintInfo:
                     var srvsvcSharePrintInfoMask = (AccessMask_SrvsvcSharePrintInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcSharePrintInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcSharePrintInfo)))
                     {
-                        if ((srvsvcSharePrintInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcSharePrintInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcStatisticsInfo:
                     var srvsvcStatisticsInfoMask = (AccessMask_SrvsvcStatisticsInfo)ObjectSpecific;
                     foreach (AccessMask_SrvsvcStatisticsInfo __ in Enum.GetValues(typeof(AccessMask_SrvsvcStatisticsInfo)))
                     {
-                        if ((srvsvcStatisticsInfoMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcStatisticsInfoMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.SrvsvcTransportEnum:
                     var srvsvcTransportEnumMask = (AccessMask_SrvsvcTransportEnum)ObjectSpecific;
                     foreach (AccessMask_SrvsvcTransportEnum __ in Enum.GetValues(typeof(AccessMask_SrvsvcTransportEnum)))
                     {
-                        if ((srvsvcTransportEnumMask & __) != 0) list.Add(__.ToString());
+                        if ((srvsvcTransportEnumMask & __) == __) list.Add(__.ToString());
                     }
                     break;
             }

@@ -11,7 +11,7 @@ namespace WinSdUtil.Lib.Model
     {
         internal static string RegexPatternSid = @"S-(?<Revision>\d+)-(?<IdentifierAuthority>\d+)(-(?<SubAuthority>\d+))+";
 
-        public static ITrusteeDataProvider? DataProvider;
+        internal static ITrusteeDataProvider? DataProvider;
 
         public string Sid { get; set; } = "S-1-0-0";
         public string Name { get; set; } = "NULL";

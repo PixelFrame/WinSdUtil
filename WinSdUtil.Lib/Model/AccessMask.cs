@@ -113,6 +113,7 @@ namespace WinSdUtil.Lib.Model
         KEY_QUERY_VALUE = 0x1,
         KEY_SET_VALUE = 0x2,
         KEY_CREATE_SUB_KEY = 0x4,
+        KEY_ENUMERATE_SUB_KEYS = 0x8,
         KEY_EXECUTE = 0x20019,
         KEY_READ = 0x20019,
         KEY_WRITE = 0x20006,

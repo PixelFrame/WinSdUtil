@@ -219,6 +219,26 @@ namespace WinSdUtil.Lib.Model
         SetInfo = 0x10,
     }
 
+    // From WinSDK wmistr.h
+    [Flags]
+    public enum AccessMask_WmiGuidObject : uint
+    {
+        WMIGUID_QUERY = 0x0001,
+        WMIGUID_SET = 0x0002,
+        WMIGUID_NOTIFICATION = 0x0004,
+        WMIGUID_READ_DESCRIPTION = 0x0008,
+        WMIGUID_EXECUTE = 0x0010,
+        TRACELOG_CREATE_REALTIME = 0x0020,
+        TRACELOG_CREATE_ONDISK = 0x0040,
+        TRACELOG_GUID_ENABLE = 0x0080,
+        TRACELOG_ACCESS_KERNEL_LOGGER = 0x0100,
+        //TRACELOG_LOG_EVENT = 0x0200,           //Pre-Vista
+        TRACELOG_CREATE_INPROC = 0x0200,
+        TRACELOG_ACCESS_REALTIME = 0x0400,
+        TRACELOG_REGISTER_GUIDS = 0x0800,
+        TRACELOG_JOIN_GROUP = 0x1000,
+    }
+
     [Flags]
     public enum AccessMask_Unknown : uint
     {
@@ -262,6 +282,7 @@ namespace WinSdUtil.Lib.Model
         SrvsvcSharePrintInfo,
         SrvsvcStatisticsInfo,
         SrvsvcTransportEnum,
+        WmiGuidObject,
         Unknown,
     }
 
@@ -426,6 +447,13 @@ namespace WinSdUtil.Lib.Model
                     foreach (AccessMask_SrvsvcTransportEnum __ in Enum.GetValues(typeof(AccessMask_SrvsvcTransportEnum)))
                     {
                         if ((srvsvcTransportEnumMask & __) == __) list.Add(__.ToString());
+                    }
+                    break;
+                case AccessMaskType.WmiGuidObject:
+                    var wmiGuidObjectEnumMask = (AccessMask_WmiGuidObject)ObjectSpecific;
+                    foreach (AccessMask_WmiGuidObject __ in Enum.GetValues(typeof(AccessMask_WmiGuidObject)))
+                    {
+                        if ((wmiGuidObjectEnumMask & __) == __) list.Add(__.ToString());
                     }
                     break;
             }

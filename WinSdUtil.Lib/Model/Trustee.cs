@@ -162,5 +162,10 @@ namespace WinSdUtil.Lib.Model
             sid.SubAuthority = regexMatch.Groups["SubAuthority"].Captures.Select(x => uint.Parse(x.Value)).ToArray();
             return sid;
         }
+
+        public static IEnumerable<Trustee> EnumAllTrustees()
+        {
+            return DataProvider?.TrusteeData ?? [];
+        }
     }
 }

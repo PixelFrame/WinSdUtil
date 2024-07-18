@@ -240,6 +240,12 @@ namespace WinSdUtil.Lib.Model
     }
 
     [Flags]
+    public enum AccessMask_FwpFilterCondition : uint
+    {
+        FWP_ACTRL_MATCH_FILTER = 0x1
+    }
+
+    [Flags]
     public enum AccessMask_Unknown : uint
     {
         BIT0001 = 0x1,
@@ -283,6 +289,7 @@ namespace WinSdUtil.Lib.Model
         SrvsvcStatisticsInfo,
         SrvsvcTransportEnum,
         WmiGuidObject,
+        FwpFilterCondition,
         Unknown,
     }
 
@@ -454,6 +461,13 @@ namespace WinSdUtil.Lib.Model
                     foreach (AccessMask_WmiGuidObject __ in Enum.GetValues(typeof(AccessMask_WmiGuidObject)))
                     {
                         if ((wmiGuidObjectEnumMask & __) == __) list.Add(__.ToString());
+                    }
+                    break;
+                case AccessMaskType.FwpFilterCondition:
+                    var fwpFilterConditionEnumMask = (AccessMask_FwpFilterCondition)ObjectSpecific;
+                    foreach (AccessMask_FwpFilterCondition __ in Enum.GetValues(typeof(AccessMask_FwpFilterCondition)))
+                    {
+                        if ((fwpFilterConditionEnumMask & __) == __) list.Add(__.ToString());
                     }
                     break;
             }

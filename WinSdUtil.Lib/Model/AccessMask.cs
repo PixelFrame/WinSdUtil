@@ -482,6 +482,17 @@ namespace WinSdUtil.Lib.Model
                 return right;
             }
 
+            if (SddlMapping.FileAccessMaskMapping.Inverse.TryGetValue(Full, out string fright))
+            {
+                return fright;
+            }
+
+            if (SddlMapping.InverseRegistryAccessMaskMapping.TryGetValue(Full, out string? rright))
+            {
+                return rright;
+            }
+
+            // Not covered by SDDL, use number directly
             if ((Full | 0xF00F01FF) != 0xF00F01FF)
             {
                 return Full.ToString();
@@ -489,7 +500,7 @@ namespace WinSdUtil.Lib.Model
 
             var sb = new StringBuilder();
             uint mask = 0x1;
-            for (int i = 0; i < 31; ++i)
+            for (int i = 0; i < 32; ++i)
             {
                 if ((Full & mask) != 0) sb.Append(SddlMapping.AccessMaskMapping.Inverse[mask]);
                 mask <<= 1;

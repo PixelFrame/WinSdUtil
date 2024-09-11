@@ -23,7 +23,7 @@
             ["CC"] = 0x00000001,
         };
 
-        internal static readonly Dictionary<string, uint> FileAccessMaskMapping = new()
+        internal static readonly BidirectionalDictionary<string, uint> FileAccessMaskMapping = new()
         {
             ["FA"] = 0x001F01FF,
             ["FR"] = 0x00120089,
@@ -37,6 +37,13 @@
             ["KR"] = 0x00020019,
             ["KW"] = 0x00020006,
             ["KX"] = 0x00020019,
+        };
+
+        internal static readonly Dictionary<uint, string> InverseRegistryAccessMaskMapping = new()
+        {
+            [0x000F003F] = "KA",
+            [0x00020019] = "KR",
+            [0x00020006] = "KW",
         };
 
         internal static readonly BidirectionalDictionary<string, ControlFlags> DAclFlagsMapping = new()

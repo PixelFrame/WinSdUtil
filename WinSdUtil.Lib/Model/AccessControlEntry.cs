@@ -48,33 +48,7 @@ namespace WinSdUtil.Lib.Model
 
             Mask.Full = 0;
             var sddlRights = regexMatchAce.Groups["Rights"].Value;
-            if (Regex.IsMatch(sddlRights, @"0x[0-9a-fA-F]"))
-            {
-                Mask.Full = Convert.ToUInt32(sddlRights, 16);
-            }
-            else if (Regex.IsMatch(sddlRights, @"\d+"))
-            {
-                if (!uint.TryParse(sddlRights, out uint accessMask))
-                { throw new ArgumentException($"Invalid ACE Right: {sddlRights}"); }
-                Mask.Full = accessMask;
-            }
-            else
-            {
-                var sddlRightsList = sddlRights.SplitInParts(2);
-                foreach (var sddlRight in sddlRightsList)
-                {
-                    uint accessBit;
-                    if (SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out accessBit)
-                        || SddlMapping.FileAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
-                        || SddlMapping.RegistryAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
-                        ) { Mask.Full |= accessBit; }
-                    else
-                    {
-                        throw new ArgumentException($"Invalid ACE Right: {sddlRight}");
-                    }
-
-                }
-            }
+            Mask.FromSDDL(sddlRights);
 
             Trustee = new(regexMatchAce.Groups["AccountSid"].Value, 0);
 

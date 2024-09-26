@@ -1,7 +1,11 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
+using System.Text.RegularExpressions;
+using WinSdUtil.Lib.Helper;
 
 namespace WinSdUtil.Lib.Model
 {
+    #region Enums
     [Flags]
     public enum AccessMask_Standard : uint
     {
@@ -292,20 +296,76 @@ namespace WinSdUtil.Lib.Model
         FwpFilterCondition,
         Unknown,
     }
+    #endregion
 
-    public class AccessMask
+    public class AccessMask : IEnumerable<(int, bool)>
     {
         public uint Standard { get; set; }
         public uint ObjectSpecific { get; set; }
-        public AccessMaskType ObjectType { get; set; }
+
+        private AccessMaskType objectType = AccessMaskType.Unknown;
+        public AccessMaskType ObjectType
+        {
+            get => objectType;
+            set
+            {
+                objectType = value;
+                objectTypeType = Type.GetType($"WinSdUtil.Lib.Model.AccessMask_{value}", true, true) ?? typeof(AccessMask_Unknown);
+            }
+        }
+
+        private Type objectTypeType = typeof(AccessMask_Unknown);
+        public Type ObjectTypeType => objectTypeType;
 
         public uint Full
         {
             get { return Standard | ObjectSpecific; }
             set { Standard = value & 0xFFFF0000; ObjectSpecific = value & 0x0000FFFF; }
         }
+        
+        public bool this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 31) throw new ArgumentOutOfRangeException("index");
+                uint bit = 1;
+                bit <<= index;
+                return (Full & bit) == bit;
+            }
+            set
+            {
+                if (index < 0 || index > 31) throw new ArgumentOutOfRangeException("index");
+                uint bit = 1;
+                bit <<= index;
+                if (value)
+                {
+                    Full |= bit;
+                }
+                else
+                {
+                    Full &= ~bit;
+                }
+            }
+        }
+        
+        public IEnumerable<string> BitNames
+        {
+            get
+            {
+                for (int j = 0; j < 16; ++j)
+                {
+                    var i = unchecked((uint)(1 << j));
+                    yield return Enum.GetName(ObjectTypeType, i) ?? "Undefined";
+                }
+                for (int j = 16; j < 32; ++j)
+                {
+                    var i = unchecked((uint)(1 << j));
+                    yield return Enum.GetName(typeof(AccessMask_Standard), i) ?? "Undefined";
+                }
+            }
+        }
 
-        public List<string> ToStrings()
+        public IEnumerable<string> ToStrings()
         {
             var list = new List<string>();
             var stdMask = (AccessMask_Standard)Standard;
@@ -506,6 +566,54 @@ namespace WinSdUtil.Lib.Model
                 mask <<= 1;
             }
             return sb.ToString();
+        }
+
+        public void FromSDDL(string sddlRights)
+        {
+            if (Regex.IsMatch(sddlRights, @"0x[0-9a-fA-F]"))
+            {
+                Full = Convert.ToUInt32(sddlRights, 16);
+            }
+            else if (Regex.IsMatch(sddlRights, @"\d+"))
+            {
+                if (!uint.TryParse(sddlRights, out uint accessMask))
+                { throw new ArgumentException($"Invalid ACE Right: {sddlRights}"); }
+                Full = accessMask;
+            }
+            else
+            {
+                Full = 0;
+                var sddlRightsList = sddlRights.SplitInParts(2);
+                foreach (var sddlRight in sddlRightsList)
+                {
+                    if (SddlMapping.AccessMaskMapping.TryGetValue(sddlRight, out uint accessBit)
+                        || SddlMapping.FileAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
+                        || SddlMapping.RegistryAccessMaskMapping.TryGetValue(sddlRight, out accessBit)
+                        ) { Full |= accessBit; }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid ACE Right: {sddlRight}");
+                    }
+                }
+            }
+        }
+
+        public IEnumerator<(int, bool)> GetEnumerator()
+        {
+            for (int j = 0; j < 32; ++j)
+            {
+                var i = unchecked((uint)(1 << j));
+                yield return (j, (i & Full) == i);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            for (int j = 0; j < 32; ++j)
+            {
+                var i = unchecked((uint)(1 << j));
+                yield return (j, (i & Full) == i);
+            }
         }
     }
 }

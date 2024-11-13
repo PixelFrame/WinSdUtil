@@ -11,9 +11,9 @@ But in some cases, it is not very convenient to use a SQLite db (e.g. Blazor WAS
 
 ``` CSharp
 var trusteeJsonData = await httpClient.GetStringAsync("data/WinSdTrustee.json");
-var adSchemaGuidJsonData = await httpClient.GetStringAsync("data/WinSdAdSchemaGuid.json");
-var sdConverter = new WinSdConverter(true, trusteeJsonData, adSchemaGuidJsonData);
+var adGuidJsonData = await httpClient.GetStringAsync("data/WinSdAdGuid.json");
+var sdConverter = new WinSdConverter(true, trusteeJsonData, adGuidJsonData);
 var acl = sdConverter.FromSddlToAcl("O:SYG:SYD:NO_ACCESS_CONTROL");
 ```
 
-The AD Schema GUID data is acquired from a fresh installed Windows Server 2022 domain controller.
+The AD Schema GUID data is acquired from a fresh installed Windows Server 2025 domain controller.

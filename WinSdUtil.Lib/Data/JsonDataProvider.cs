@@ -3,17 +3,17 @@ using WinSdUtil.Lib.Model;
 
 namespace WinSdUtil.Lib.Data
 {
-    public class JsonDataProvider : ITrusteeDataProvider, IAdSchemaGuidProvider
+    public class JsonDataProvider : ITrusteeDataProvider, IAdGuidProvider
     {
         private Trustee[] trusteeData = Array.Empty<Trustee>();
-        private AdSchemaGuid[] adSchemaGuidData = Array.Empty<AdSchemaGuid>();
+        private AdObjectGuid[] adGuidData = Array.Empty<AdObjectGuid>();
         public IEnumerable<Trustee> TrusteeData { get => trusteeData; }
-        public IEnumerable<AdSchemaGuid> AdSchemaGuidData { get => adSchemaGuidData; }
+        public IEnumerable<AdObjectGuid> AdGuidData { get => adGuidData; }
 
-        public JsonDataProvider(string trusteeJsonData, string adSchemaGuidJsonData)
+        public JsonDataProvider(string trusteeJsonData, string adGuidJsonData)
         {
-            trusteeData = JsonSerializer.Deserialize<Trustee[]>(trusteeJsonData) ?? Array.Empty<Trustee>();
-            adSchemaGuidData = JsonSerializer.Deserialize<AdSchemaGuid[]>(adSchemaGuidJsonData) ?? Array.Empty<AdSchemaGuid>();
+            trusteeData = JsonSerializer.Deserialize<Trustee[]>(trusteeJsonData) ?? [];
+            adGuidData = JsonSerializer.Deserialize<AdObjectGuid[]>(adGuidJsonData) ?? [];
         }
     }
 }

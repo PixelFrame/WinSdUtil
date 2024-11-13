@@ -2,11 +2,11 @@
 
 namespace WinSdUtil.Lib.Data
 {
-    public class LibDbDataProvider : ITrusteeDataProvider, IAdSchemaGuidProvider, IDisposable
+    public class LibDbDataProvider : ITrusteeDataProvider, IAdGuidProvider, IDisposable
     {
         private readonly LibDbContext dbContext = new();
         public IEnumerable<Trustee> TrusteeData { get => dbContext.Trustees; }
-        public IEnumerable<AdSchemaGuid> AdSchemaGuidData { get => dbContext.AdSchemaGuids; }
+        public IEnumerable<AdObjectGuid> AdGuidData { get => dbContext.AdGuids; }
 
         public LibDbDataProvider() { }
         public LibDbDataProvider(string ConnString)

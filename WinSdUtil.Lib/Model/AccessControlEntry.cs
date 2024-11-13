@@ -13,14 +13,14 @@ namespace WinSdUtil.Lib.Model
         public AceFlags Flags { get; set; } = 0;
         public AccessMask Mask { get; set; } = new();
         public Guid ObjectGuid { get; set; }
-        public AdSchemaGuid AdSchemaObjectGuid
+        public AdObjectGuid AdObjectGuid
         {
-            get => new AdSchemaGuid(ObjectGuid.ToString());
+            get => new AdObjectGuid(ObjectGuid.ToString());
         }
         public Guid InheritObjectGuid { get; set; }
-        public AdSchemaGuid AdSchemaInheritObjectGuid
+        public AdObjectGuid AdInheritObjectGuid
         {
-            get => new AdSchemaGuid(InheritObjectGuid.ToString());
+            get => new AdObjectGuid(InheritObjectGuid.ToString());
         }
         public Trustee Trustee { get; set; } = new();
         public byte[] ApplicationData { get; set; } = Array.Empty<byte>();
@@ -185,17 +185,17 @@ namespace WinSdUtil.Lib.Model
             if (ObjectGuid != Guid.Empty)
             {
                 sb.Append("Object: ");
-                sb.Append(AdSchemaObjectGuid.Name);
+                sb.Append(AdObjectGuid.DisplayName);
                 sb.Append('(');
-                sb.Append(AdSchemaObjectGuid.SchemaIdGuid);
+                sb.Append(AdObjectGuid.Guid);
                 sb.Append(")|");
             }
             if (InheritObjectGuid != Guid.Empty)
             {
                 sb.Append("InheritedObject: ");
-                sb.Append(AdSchemaInheritObjectGuid.Name);
+                sb.Append(AdInheritObjectGuid.DisplayName);
                 sb.Append('(');
-                sb.Append(AdSchemaInheritObjectGuid.SchemaIdGuid);
+                sb.Append(AdInheritObjectGuid.Guid);
                 sb.Append(")|");
             }
             sb.Append($"{Trustee.DisplayName} ({Trustee.SddlName})");

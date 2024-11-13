@@ -21,7 +21,7 @@ namespace WinSdUtil.Lib
                 var adSchemaGuidJsonData = File.ReadAllText("Data/WinSdAdSchemaGuid.json");
                 jsonDataProvider = new JsonDataProvider(trusteeJsonData, adSchemaGuidJsonData);
                 Trustee.DataProvider = jsonDataProvider;
-                AdSchemaGuid.DataProvider = jsonDataProvider;
+                AdObjectGuid.DataProvider = jsonDataProvider;
             }
             else
             {
@@ -35,7 +35,7 @@ namespace WinSdUtil.Lib
             {
                 jsonDataProvider = new JsonDataProvider(TrusteeJsonData, AdSchemaGuidJsonData);
                 Trustee.DataProvider = jsonDataProvider;
-                AdSchemaGuid.DataProvider = jsonDataProvider;
+                AdObjectGuid.DataProvider = jsonDataProvider;
             }
             else
             {
@@ -47,14 +47,14 @@ namespace WinSdUtil.Lib
         {
             if (libDbDataProvider == null) { libDbDataProvider = new LibDbDataProvider(); }
             Trustee.DataProvider = libDbDataProvider;
-            AdSchemaGuid.DataProvider = libDbDataProvider;
+            AdObjectGuid.DataProvider = libDbDataProvider;
         }
 
         private void initLibDbDataProvider(string ConnString)
         {
             if (libDbDataProvider == null) { libDbDataProvider = new LibDbDataProvider(ConnString); }
             Trustee.DataProvider = libDbDataProvider;
-            AdSchemaGuid.DataProvider = libDbDataProvider;
+            AdObjectGuid.DataProvider = libDbDataProvider;
         }
 
         public AccessControlList FromSddlToAcl(string SDDL)

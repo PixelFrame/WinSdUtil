@@ -17,7 +17,7 @@
     <None Update="Data\WinSd.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\WinSdAdSchemaGuid.json">
+    <None Update="Data\WinSdAdGuid.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Data\WinSdTrustee.json">

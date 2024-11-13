@@ -7,7 +7,7 @@ namespace WinSdUtil.Lib.Data
     {
         private string connString = "Data Source=Data/WinSd.db;";
         public DbSet<Trustee> Trustees { get; set; }
-        public DbSet<AdSchemaGuid> AdSchemaGuids { get; set; }
+        public DbSet<AdObjectGuid> AdGuids { get; set; }
 
         public LibDbContext() { }
         public LibDbContext(string ConnString)
@@ -23,7 +23,7 @@ namespace WinSdUtil.Lib.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trustee>().ToTable("Trustee").HasKey(t => t.Sid);
-            modelBuilder.Entity<AdSchemaGuid>().ToTable("AdSchemaGuid").HasKey(t => t.SchemaIdGuid);
+            modelBuilder.Entity<AdObjectGuid>().ToTable("AdGuid").HasKey(t => t.Guid);
         }
     }
 }

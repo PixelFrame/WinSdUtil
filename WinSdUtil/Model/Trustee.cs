@@ -26,17 +26,19 @@ namespace WinSdUtil.Model
         public Trustee(string SddlTrusteeOrSid, int Type)
         {
             if (DataProvider == null) return;
+
             var dataSource = DataProvider.TrusteeData;
             Trustee? dbResult = null;
             if (Type == 0) dbResult = dataSource.FirstOrDefault(t => t.SddlName == SddlTrusteeOrSid);
             else dbResult = dataSource.FirstOrDefault(t => t.Sid == SddlTrusteeOrSid);
+
             if (dbResult == null)
             {
                 if (SddlTrusteeOrSid.StartsWith("S-1-5-5"))
                 {
-                    dbResult = dataSource.Single(t => t.SddlName == "S-1-5-5-x-y");
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Copy(dataSource.Single(t => t.SddlName == "S-1-5-5-x-y"));
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-5-21"))
                 {
@@ -45,93 +47,70 @@ namespace WinSdUtil.Model
                     dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<machine>-{RID}");
                     dbResult ??= dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<root domain>-{RID}");
                     dbResult ??= dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-21-<domain>-{RID}");
-                    dbResult ??= new Trustee()
+                    if (dbResult != null)
                     {
-                        Name = "DOMAIN_ACCOUNT",
-                        DisplayName = "Unknown (Domain Account)",
-                        Description = "An account from Active Directory or local computer.",
-                        IsLocal = false,
-                        DomainId = domainSidMatch.Groups["DomainId"].Value
+                        Copy(dbResult);
+                    }
+                    else
+                    {
+                        Name = "DOMAIN_ACCOUNT";
+                        DisplayName = "Unknown (Domain Account)";
+                        Description = "An account from Active Directory or local computer.";
+                        IsLocal = false;
+                        DomainId = domainSidMatch.Groups["DomainId"].Value;
                     };
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-5-80"))
                 {
-                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-5-80-<SERVICE>");
-                    dbResult ??= new Trustee()
-                    {
-                        Name = "NT_SERVICE",
-                        DisplayName = "NT Service",
-                        Description = "An NT Service account.",
-                        IsLocal = false,
-                        DomainId = null
-                    };
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Copy(dataSource.Single(t => t.Sid == $"S-1-5-80-<SERVICE>"));
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-15-2"))
                 {
-                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-2-<AppNameHash>");
-                    dbResult ??= new Trustee()
-                    {
-                        Name = "APP_PACKAGE",
-                        DisplayName = "Application Package",
-                        Description = "An application running in an app package context.",
-                        IsLocal = true,
-                        DomainId = null
-                    };
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Copy(dataSource.Single(t => t.Sid == $"S-1-15-2-<AppNameHash>"));
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-15-3-1024"))
                 {
-                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-3-1024-<AppCapNameHash>");
-                    dbResult ??= new Trustee()
-                    {
-                        Name = "APP_CAPABILITY_APP_CAPABILITY",
-                        DisplayName = "App Capability: app capability",
-                        Description = "App Capability: app capability",
-                        IsLocal = true,
-                        DomainId = null
-                    };
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Copy(dataSource.Single(t => t.Sid == $"S-1-15-3-1024-<AppCapNameHash>"));
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else if (SddlTrusteeOrSid.StartsWith("S-1-15-3"))
                 {
-                    dbResult = dataSource.FirstOrDefault(t => t.Sid == $"S-1-15-3-<GUID>");
-                    dbResult ??= new Trustee()
-                    {
-                        Name = "APP_CAPABILITY_DEVICE_CAPABILITY",
-                        DisplayName = "App Capability: device capability",
-                        Description = "App Capability: device capability.",
-                        IsLocal = true,
-                        DomainId = null
-                    };
-                    dbResult.Sid = SddlTrusteeOrSid;
-                    dbResult.SddlName = SddlTrusteeOrSid;
+                    Copy(dataSource.Single(t => t.Sid == $"S-1-15-3-<GUID>"));
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
                 }
                 else
                 {
-                    dbResult = new Trustee()
-                    {
-                        Sid = SddlTrusteeOrSid,
-                        Name = "UNKNOWN",
-                        DisplayName = "(Unknwon Account)",
-                        SddlName = SddlTrusteeOrSid,
-                        Description = "Unknown Account",
-                        IsLocal = false,
-                        DomainId = null
-                    };
+                    Sid = SddlTrusteeOrSid;
+                    Name = "UNKNOWN";
+                    DisplayName = "(Unknwon Account)";
+                    SddlName = SddlTrusteeOrSid;
+                    Description = "Unknown Account";
+                    IsLocal = false;
+                    DomainId = null;
                 }
             }
-            else if (!dbResult.IsLocal && SddlTrusteeOrSid.Length > 2)
+            else
             {
-                dbResult.Sid = SddlTrusteeOrSid;
-                dbResult.SddlName = SddlTrusteeOrSid;
+                Copy(dbResult);
+                if (!IsLocal && SddlTrusteeOrSid.Length > 2)
+                {
+                    Sid = SddlTrusteeOrSid;
+                    SddlName = SddlTrusteeOrSid;
+                }
+                else if (Sid.StartsWith("S-1-5-80"))
+                {
+                    DisplayName = "NT Service: " + dbResult.DisplayName;
+                    Name = @"NT SERVICE\" + dbResult.Name;
+                }
             }
-            this.Copy(dbResult!);
         }
 
         private void Copy(Trustee source)

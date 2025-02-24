@@ -7,7 +7,7 @@ namespace WinSdUtil.Model
 {
     public class AccessControlEntry
     {
-        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>0x[0-9a-fA-F]*|[0-9A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(?<ResourceAttribute>\([^\(\)]\))?\)";
+        public static readonly string RegexPatternAce = @"\((?<AceType>[A-Z]*);(?<AceFlags>[A-Z]*);(?<Rights>0x[0-9a-fA-F]*|[0-9A-Z]*);(?<ObjectGuid>[A-Za-z\d\-]*);(?<InheritObjectGuid>[A-Za-z\d\-]*);(?<AccountSid>[A-Za-z\d\-]*);?(\((?<ResourceAttribute>[^\(\)]*)\))?\)";
 
         public AceType Type { get; set; } = 0;
         public AceFlags Flags { get; set; } = 0;
@@ -23,7 +23,7 @@ namespace WinSdUtil.Model
             get => new AdObjectGuid(InheritObjectGuid.ToString());
         }
         public Trustee Trustee { get; set; } = new();
-        public byte[] ApplicationData { get; set; } = Array.Empty<byte>();
+        public string ApplicationData { get; set; } = string.Empty;
 
         public AccessControlEntry() { }
         public AccessControlEntry(string SddlAce)
@@ -54,6 +54,7 @@ namespace WinSdUtil.Model
 
             if (regexMatchAce.Groups["ObjectGuid"].Value != string.Empty) ObjectGuid = new Guid(regexMatchAce.Groups["ObjectGuid"].Value);
             if (regexMatchAce.Groups["InheritObjectGuid"].Value != string.Empty) InheritObjectGuid = new Guid(regexMatchAce.Groups["InheritObjectGuid"].Value);
+            if (regexMatchAce.Groups["ResourceAttribute"].Value != string.Empty) ApplicationData = regexMatchAce.Groups["ResourceAttribute"].Value;
         }
 
         public string ToSDDL()
@@ -88,6 +89,13 @@ namespace WinSdUtil.Model
 
             sb.Append(Trustee.SddlName);
 
+            if (ApplicationData != string.Empty)
+            {
+                sb.Append(';');
+                sb.Append('(');
+                sb.Append(ApplicationData);
+                sb.Append(')');
+            }
             sb.Append(')');
             return sb.ToString();
         }
@@ -139,8 +147,8 @@ namespace WinSdUtil.Model
                     aceCb.Header.AceFlags = (byte)Flags;
                     aceCb.Mask = Mask.Full;
                     aceCb.Sid = Trustee.ToBinarySid();
-                    aceCb.ApplicationData = ApplicationData;
-                    aceCb.Header.AceSize = (ushort)(16 + 4 * aceCb.Sid.SubAuthorityCount + ApplicationData.Length);
+                    aceCb.ApplicationData = Encoding.Unicode.GetBytes(ApplicationData);
+                    aceCb.Header.AceSize = (ushort)(16 + 4 * aceCb.Sid.SubAuthorityCount + ApplicationData.Length * 2);
                     return aceCb.GetBytes();
                 case AceType.AccessAllowedCallbackObject:
                 case AceType.AccessDeniedCallbackObject:
@@ -163,8 +171,8 @@ namespace WinSdUtil.Model
                         aceCbObj.Header.AceSize += 16;
                     }
                     aceCbObj.Sid = Trustee.ToBinarySid();
-                    aceCbObj.ApplicationData = ApplicationData;
-                    aceCbObj.Header.AceSize += (ushort)(20 + 4 * aceCbObj.Sid.SubAuthorityCount + ApplicationData.Length);
+                    aceCbObj.ApplicationData = Encoding.Unicode.GetBytes(ApplicationData);  // This is likely wrong from test result, but we don't have more details about how to convert it to binary for now
+                    aceCbObj.Header.AceSize += (ushort)(20 + 4 * aceCbObj.Sid.SubAuthorityCount + ApplicationData.Length * 2);
                     return aceCbObj.GetBytes();
                 default:
                     throw new NotImplementedException($"The specified ACE type ({Type}) is not supported to be converted to binary.");

@@ -555,7 +555,7 @@ namespace WinSdUtil.Model
             // Not covered by SDDL, use number directly
             if ((Full | 0xF00F01FF) != 0xF00F01FF)
             {
-                return Full.ToString();
+                return $"0x{Full:x}";
             }
 
             var sb = new StringBuilder();

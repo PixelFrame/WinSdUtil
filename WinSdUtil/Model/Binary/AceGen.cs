@@ -109,7 +109,7 @@ namespace WinSdUtil.Model.Binary
                 ObjectGuid = structAce.ObjectType.GetValueOrDefault(),
                 InheritObjectGuid = structAce.InheritedObjectType.GetValueOrDefault(),
                 Trustee = new Trustee(structAce.Sid.ToString(), 1),
-                ApplicationData = structAce.ApplicationData
+                ApplicationData = structAce.ApplicationData != null ? System.Text.Encoding.Unicode.GetString(structAce.ApplicationData) : string.Empty
             };
             return manAce;
         }

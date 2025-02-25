@@ -244,6 +244,22 @@ namespace WinSdUtil.Model
     }
 
     [Flags]
+    public enum AccessMask_Fwpm : uint
+    {
+        FWPM_ACTRL_ADD = 0x00000001,
+        FWPM_ACTRL_ADD_LINK = 0x00000002,
+        FWPM_ACTRL_BEGIN_READ_TXN = 0x00000004,
+        FWPM_ACTRL_BEGIN_WRITE_TXN = 0x00000008,
+        FWPM_ACTRL_CLASSIFY = 0x00000010,
+        FWPM_ACTRL_ENUM = 0x00000020,
+        FWPM_ACTRL_OPEN = 0x00000040,
+        FWPM_ACTRL_READ = 0x00000080,
+        FWPM_ACTRL_READ_STATS = 0x00000100,
+        FWPM_ACTRL_SUBSCRIBE = 0x00000200,
+        FWPM_ACTRL_WRITE = 0x00000400,
+    }
+
+    [Flags]
     public enum AccessMask_FwpFilterCondition : uint
     {
         FWP_ACTRL_MATCH_FILTER = 0x1
@@ -293,6 +309,7 @@ namespace WinSdUtil.Model
         SrvsvcStatisticsInfo,
         SrvsvcTransportEnum,
         WmiGuidObject,
+        Fwpm,
         FwpFilterCondition,
         Unknown,
     }
@@ -322,7 +339,7 @@ namespace WinSdUtil.Model
             get { return Standard | ObjectSpecific; }
             set { Standard = value & 0xFFFF0000; ObjectSpecific = value & 0x0000FFFF; }
         }
-        
+
         public bool this[int index]
         {
             get
@@ -347,7 +364,7 @@ namespace WinSdUtil.Model
                 }
             }
         }
-        
+
         public IEnumerable<string> BitNames
         {
             get
@@ -521,6 +538,13 @@ namespace WinSdUtil.Model
                     foreach (AccessMask_WmiGuidObject __ in Enum.GetValues(typeof(AccessMask_WmiGuidObject)))
                     {
                         if ((wmiGuidObjectEnumMask & __) == __) list.Add(__.ToString());
+                    }
+                    break;
+                case AccessMaskType.Fwpm:
+                    var fwpmEnumMask = (AccessMask_Fwpm)ObjectSpecific;
+                    foreach (AccessMask_Fwpm __ in Enum.GetValues(typeof(AccessMask_Fwpm)))
+                    {
+                        if ((fwpmEnumMask & __) == __) list.Add(__.ToString());
                     }
                     break;
                 case AccessMaskType.FwpFilterCondition:
